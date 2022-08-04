@@ -3,3 +3,5 @@
 The Cursed Editor for [Bevy](https://bevyengine.org)
 
 From [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor)
+
+Project files is saved as `.po2`
