@@ -7,7 +7,7 @@
 <a href="https://crates.io/crates/potoo"><img src="https://img.shields.io/crates/d/potoo" alt="downloads/link to crates.io"></a>   
 <a href="https://github.com/BlackPhlox/potoo"><img src="https://img.shields.io/github/stars/BlackPhlox/potoo" alt="stars/github repo"></a>
 <a href="https://github.com/BlackPhlox/potoo/actions/workflows/ci.yml"><img src="https://github.com/BlackPhlox/potoo/actions/workflows/ci.yml/badge.svg" alt="github actions"></a>
-<a href="https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking"><img src="https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue" alt="tracking bevy release branch"></a>
+<a href="https://github.com/bevyengine/bevy/tree/latest"><img src="https://img.shields.io/badge/Bevy%20Tracking-Release-lightblue" alt="tracking bevy release branch"></a>
 </div><br>
 
 The Cursed Editor for [Bevy](https://bevyengine.org)
