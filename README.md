@@ -1,6 +1,6 @@
 # Potoo 👻🐦
 
-<div align="left">
+<div align="center">
 <a href="https://crates.io/crates/potoo"><img src="https://img.shields.io/crates/v/potoo" alt="link to crates.io"></a>
 <a href="https://docs.rs/potoo"><img src="https://docs.rs/potoo/badge.svg" alt="link to docs.rs"></a>
 <a href="https://github.com/BlackPhlox/potoo/blob/main/LICENSE-APACHE"><img src="https://img.shields.io/crates/l/potoo" alt="link to license"></a>
