@@ -32,8 +32,9 @@ Currently [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor)
 
 Notice: This will be handle automatically by the editor in the future.
 
+Run these commands in two seperate terminals to enable hot-reloading: 
 ## Linux and macOS
-Use 
+
 ```
 $ cargo watch -w systems -w components -x "build -p systems --features dynamic"
 $ cargo run --features reload
