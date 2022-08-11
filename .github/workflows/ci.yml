@@ -24,6 +24,8 @@ jobs:
     needs: update
     steps:
       - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -72,6 +74,8 @@ jobs:
     needs: update
     steps:
       - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
