@@ -1,1 +1,6 @@
-/target
+target
+Cargo.lock
+/assets
+
+.idea
+/target-bin/

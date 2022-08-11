@@ -1,21 +1,27 @@
+[workspace]
+resolver = "2"
+members = ["systems", "components"]
+
 [package]
 name = "potoo"
-version = "0.0.0"
+version = "0.0.1"
 edition = "2021"
 description = "The Cursed Editor for Bevy"
 license = "MIT OR Apache-2.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[workspace]
-resolver = "2"
-members = ["systems"]
-
 [dependencies]
 bevy = { version = "0.8.0" }
-hot-lib-reloader = { version = "0.4.2", optional = true }
+components = { path = "components" }
+hot-lib-reloader = { version = "0.5.3", optional = true }
+rand = "0.8.5"
 systems = { path = "systems" }
 
 [features]
-default = ["reload"]
-reload = ["dep:hot-lib-reloader"]
+default = []
+reload = [
+  "dep:hot-lib-reloader",
+  # Make sure that the types don't change:
+  "components/dynamic",
+  # This is important on windows for avoiding file locking issues:
+  "bevy/dynamic",
+]
