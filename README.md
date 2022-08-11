@@ -10,13 +10,21 @@
 <a href="https://github.com/bevyengine/bevy/tree/latest"><img src="https://img.shields.io/badge/Bevy%20Tracking-Release-lightblue" alt="tracking bevy release branch"></a>
 </div><br>
 
-The Cursed Editor for [Bevy](https://bevyengine.org)
+The Cursed Editor for [Bevy](https://bevyengine.org).
 
-Plan is to migrate [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor) and split `bevy_codegen` out to a seperate repository once `potoo` as at MVP.
+A code first editor that allows you to export your plugin or game project to code.
+
+Currently [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor) is being migrated into `potoo` and focusing on getting the [bevy_editor_pls](https://github.com/jakobhellermann/bevy_editor_pls) dependency working for bevy `0.8` and hot-reloading with the editor.
+
+ `bevy_codegen`, which is the export part, is then split out to a separate repository once `potoo` as at MVP.
 
 - Uses [hot-lib-reloader](https://github.com/rksm/hot-lib-reloader-rs) for hot-reloading allowing for faster iteration times of your bevy applications.
 
-- Some things like data structures cannot be changed during hot-reloading runtime, `potoo` knows this as it know about the code and reloads your entire application, to reduce friction.
+# Future plan
+
+- Import existing bevy code using `syn`
+
+- Some things like data structures cannot be changed during hot-reloading runtime, `potoo` knows this as it know about the code and reloads your entire application to reduce friction.
 
 - Project files will be saved as `.po2`, which will include version check for compatibility and auto-conversion.
 
@@ -36,4 +44,7 @@ $ cargo run --features reload
 $ cargo watch -w systems -w components -x "build -p systems --features dynamic"
 $ cargo run --features reload
 ```
+
+# Licensing
+The project is under dual license MIT and Apache-2.0
 
