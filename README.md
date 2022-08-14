@@ -24,7 +24,7 @@ Currently [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor)
 
 - Import existing bevy code using `syn`
 
-- Some things like data structures cannot be changed during hot-reloading runtime, `potoo` knows this as it know about the code and reloads your entire application to reduce friction.
+- Some things like data structures cannot be changed during hot-reloading runtime, `potoo` knows this and only reloads your entire application when required, to reduce friction for the user.
 
 - Project files will be saved as `.po2`, which will include version check for compatibility and auto-conversion.
 
