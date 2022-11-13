@@ -43,7 +43,7 @@ $ cargo run --features reload
 ## Windows
 ```
 $ cargo watch -w systems -w components -x "build -p systems --features dynamic"
-$ cargo run --features reload
+$ cargo run --features reload --target-dir "target-bin"
 ```
 
 # Licensing
