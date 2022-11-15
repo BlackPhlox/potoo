@@ -39,7 +39,7 @@ pub fn player_movement_system(
     }
 
     if keyboard_input.pressed(KeyCode::Right) {
-        rotation_factor -= 1.0;
+        rotation_factor -= 4.0;
     }
 
     if keyboard_input.pressed(KeyCode::Up) {

@@ -16,3 +16,4 @@ pub struct Player {
     pub rotation_speed: f32,
     pub shooting_timer: Option<Timer>,
 }
+
