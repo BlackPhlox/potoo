@@ -15,3 +15,4 @@ license = "MIT OR Apache-2.0"
 bevy = "0.9.1"
 bevy_editor_pls = "0.2.0"
 bevy_codegen = { path = "bevy_codegen"}
+undo = "0.48"
