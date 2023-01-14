@@ -1,14 +1,16 @@
 use codegen::{Field, Function, Scope, Struct};
 use rust_format::{Formatter, RustFmt};
 
+use crate::model::{Component, Plugin, System};
+
 trait BevyCodegen {
     fn create_app(&mut self, inner_content: &str) -> &mut Function;
 
-    fn create_plugin(&mut self, name: &str, is_group: bool, content: &str) -> &mut Function;
+    fn create_plugin(&mut self, plugin: Plugin, content: &str) -> &mut Function;
 
-    fn create_query(&mut self, system: &crate::model::System) -> &mut Function;
+    fn create_query(&mut self, system: System) -> &mut Function;
 
-    fn create_component(&mut self, name: &str, content: Vec<(String, String)>) -> &mut Struct;
+    fn create_component(&mut self, component: Component) -> &mut Struct;
 
     fn generate(&mut self) -> String;
 }
@@ -19,11 +21,11 @@ impl BevyCodegen for Scope {
             .line(format!("App::new(){}.run();", inner_content))
     }
 
-    fn create_plugin(&mut self, name: &str, is_group: bool, content: &str) -> &mut Function {
-        self.new_struct(name).vis("pub");
-        let plugin_impl = match is_group {
-            false => self.new_impl(name).impl_trait("Plugin"),
-            true => self.new_impl(name).impl_trait("Plugins"),
+    fn create_plugin(&mut self, plugin: Plugin, content: &str) -> &mut Function {
+        self.new_struct(&plugin.name).vis("pub");
+        let plugin_impl = match &plugin.is_group {
+            false => self.new_impl(&plugin.name).impl_trait("Plugin"),
+            true => self.new_impl(&plugin.name).impl_trait("Plugins"),
         };
         plugin_impl
             .new_fn("build")
@@ -34,7 +36,7 @@ impl BevyCodegen for Scope {
             .line(";")
     }
 
-    fn create_query(&mut self, system: &crate::model::System) -> &mut Function {
+    fn create_query(&mut self, system: System) -> &mut Function {
         let mut fun = self.new_fn(system.name.as_str());
         for (name, ty) in &system.param {
             fun = fun.arg(name, ty);
@@ -48,9 +50,9 @@ impl BevyCodegen for Scope {
         fun.line(system.content.clone())
     }
 
-    fn create_component(&mut self, name: &str, content: Vec<(String, String)>) -> &mut Struct {
-        let a = self.new_struct(name);
-        for (n, t) in content.iter() {
+    fn create_component(&mut self, component: Component) -> &mut Struct {
+        let a = self.new_struct(&component.name);
+        for (n, t) in component.content.iter() {
             a.push_field(Field::new(n, t));
         }
         a.derive("Component")
@@ -85,7 +87,7 @@ r#"fn main() {
     #[rustfmt::skip]
     fn create_plugin_works() {
         let mut scp = Scope::new();
-        scp.create_plugin("TestPlugin", false, "");
+        scp.create_plugin(Plugin { name: "TestPlugin".to_string(), is_group: false, dependencies: vec![] }, "");
         assert_eq!(
             scp.generate(),
 r#"pub struct TestPlugin;
@@ -103,7 +105,7 @@ impl Plugin for TestPlugin {
     #[rustfmt::skip]
     fn create_plugin_group_works() {
         let mut scp = Scope::new();
-        scp.create_plugin("TestPlugins", true, "");
+        scp.create_plugin(Plugin{ name: "TestPlugins".to_string(), is_group: true, dependencies: vec![] }, "");
         assert_eq!(
             scp.generate(),
 r#"pub struct TestPlugins;
@@ -120,7 +122,7 @@ impl Plugins for TestPlugins {
     #[test]
     fn create_simple_query_works() {
         let mut scp = Scope::new();
-        scp.create_query(&System {
+        scp.create_query(System {
             name: "test".to_string(),
             param: vec![],
             content: "".to_string(),
@@ -134,7 +136,7 @@ impl Plugins for TestPlugins {
     #[rustfmt::skip]
     fn create_query_with_params_and_attribute_works() {
         let mut scp = Scope::new();
-        scp.create_query(&System {
+        scp.create_query(System {
             name: "test2".to_string(),
             param: vec![("field".to_string(), "Type".to_string())],
             content: "".to_string(),
@@ -153,7 +155,7 @@ pub fn test2(field: Type) {}
     #[rustfmt::skip]
     fn create_component_works() {
         let mut scp = Scope::new();
-        scp.create_component("TestPlugin", vec![]);
+        scp.create_component(Component { name: "TestPlugin".to_string(), content: vec![] });
         assert_eq!(
             scp.generate(),
 r#"#[derive(Component)]
