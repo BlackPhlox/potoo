@@ -1,4 +1,5 @@
 use codegen::{Field, Function, Scope, Struct};
+use rust_format::{Formatter, RustFmt};
 
 trait BevyCodegen {
     fn create_app(&mut self, inner_content: &str) -> &mut Function;
@@ -8,6 +9,8 @@ trait BevyCodegen {
     fn create_query(&mut self, system: &crate::model::System) -> &mut Function;
 
     fn create_component(&mut self, name: &str, content: Vec<(String, String)>) -> &mut Struct;
+
+    fn generate(&mut self) -> String;
 }
 
 impl BevyCodegen for Scope {
@@ -36,7 +39,9 @@ impl BevyCodegen for Scope {
         for (name, ty) in &system.param {
             fun = fun.arg(name, ty);
         }
-        fun.vis(&system.visibility);
+        if &system.visibility.len() > &0 {
+            fun.vis(&system.visibility);
+        }
         for att in &system.attributes {
             fun.attr(att);
         }
@@ -50,8 +55,11 @@ impl BevyCodegen for Scope {
         }
         a.derive("Component")
     }
-}
 
+    fn generate(&mut self) -> String {
+        RustFmt::default().format_str(self.to_string()).unwrap()
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -60,30 +68,97 @@ mod tests {
     use super::*;
 
     #[test]
+    #[rustfmt::skip]
     fn create_app_works() {
         let mut scp = Scope::new();
         scp.create_app(".add_plugins(DefaultPlugins)");
-        assert_eq!(scp.to_string(), "fn main() {\n    App::new().add_plugins(DefaultPlugins).run();\n}");
+        assert_eq!(
+            scp.generate(),
+r#"fn main() {
+    App::new().add_plugins(DefaultPlugins).run();
+}
+"#
+        );
     }
 
     #[test]
+    #[rustfmt::skip]
     fn create_plugin_works() {
         let mut scp = Scope::new();
         scp.create_plugin("TestPlugin", false, "");
-        assert_eq!(scp.to_string(), "pub struct TestPlugin;\n\nimpl Plugin for TestPlugin {\n    fn build(&self, app: &mut App) {\n        app\n\n        ;\n    }\n}");
+        assert_eq!(
+            scp.generate(),
+r#"pub struct TestPlugin;
+
+impl Plugin for TestPlugin {
+    fn build(&self, app: &mut App) {
+        app;
+    }
+}
+"#
+        );
     }
 
     #[test]
-    fn create_query_works() {
+    #[rustfmt::skip]
+    fn create_plugin_group_works() {
         let mut scp = Scope::new();
-        scp.create_query(&System{ name: "test".to_string(), param: vec![], content: "".to_string(), visibility: "".to_string(), attributes: vec![] });
-        assert_eq!(scp.to_string(), " fn test() {\n\n}");
+        scp.create_plugin("TestPlugins", true, "");
+        assert_eq!(
+            scp.generate(),
+r#"pub struct TestPlugins;
+
+impl Plugins for TestPlugins {
+    fn build(&self, app: &mut App) {
+        app;
+    }
+}
+"#
+        );
     }
 
     #[test]
+    fn create_simple_query_works() {
+        let mut scp = Scope::new();
+        scp.create_query(&System {
+            name: "test".to_string(),
+            param: vec![],
+            content: "".to_string(),
+            visibility: "".to_string(),
+            attributes: vec![],
+        });
+        assert_eq!(scp.generate(), "fn test() {}\n");
+    }
+
+    #[test]
+    #[rustfmt::skip]
+    fn create_query_with_params_and_attribute_works() {
+        let mut scp = Scope::new();
+        scp.create_query(&System {
+            name: "test2".to_string(),
+            param: vec![("field".to_string(), "Type".to_string())],
+            content: "".to_string(),
+            visibility: "pub".to_string(),
+            attributes: vec!["no_mangle".to_string()],
+        });
+        assert_eq!(
+            scp.generate(),
+r#"#[no_mangle]
+pub fn test2(field: Type) {}
+"#
+        );
+    }
+
+    #[test]
+    #[rustfmt::skip]
     fn create_component_works() {
         let mut scp = Scope::new();
         scp.create_component("TestPlugin", vec![]);
-        assert_eq!(scp.to_string(), "#[derive(Component)]\nstruct TestPlugin;");
+        assert_eq!(
+            scp.generate(),
+r#"#[derive(Component)]
+struct TestPlugin;
+"#
+        );
     }
 }

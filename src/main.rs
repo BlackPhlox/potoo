@@ -1,5 +1,10 @@
-use bevy::{DefaultPlugins, prelude::{App, KeyCode}, diagnostic::FrameTimeDiagnosticsPlugin, winit::WinitSettings};
-use bevy_editor_pls::{prelude::*, controls};
+use bevy::{
+    diagnostic::FrameTimeDiagnosticsPlugin,
+    prelude::{App, KeyCode},
+    winit::WinitSettings,
+    DefaultPlugins,
+};
+use bevy_editor_pls::{controls, prelude::*};
 
 fn main() {
     /*App::new()
@@ -15,19 +20,10 @@ fn main() {
     write_outer_cargo();
 }
 
-fn write_outer_cargo() {
+fn write_outer_cargo() {}
 
-}
+fn write_src_folder() {}
 
-fn write_src_folder(){
+fn write_components_folder() {}
 
-}
-
-fn write_components_folder(){
-
-}
-
-fn write_systems_folder(){
-
-}
-
+fn write_systems_folder() {}
