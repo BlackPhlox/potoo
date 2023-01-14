@@ -2773,6 +2773,7 @@ dependencies = [
  "bevy",
  "bevy_codegen",
  "bevy_editor_pls",
+ "rust-format",
  "undo",
 ]
 

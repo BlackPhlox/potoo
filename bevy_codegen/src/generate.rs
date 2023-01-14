@@ -1,7 +1,60 @@
 use codegen::{Field, Function, Scope, Struct};
 use rust_format::{Formatter, RustFmt};
 
-use crate::model::{Component, Plugin, System};
+use crate::model::{Component, Plugin, System, BevyType, BevyModel};
+
+impl BevyModel {
+    pub fn generate(&self) -> Scope {
+        let mut scope = Scope::new();
+
+        if self.meta.bevy_type.eq(&BevyType::Example) {
+            scope.import("bevy_test", "BevyTest");
+        }
+
+        let mut plugin_app_code: String = "".into();
+        for plugin in &self.plugins {
+            if plugin.is_group {
+                plugin_app_code.push_str(format!(".add_plugins({})", &plugin.name).as_str());
+            } else {
+                plugin_app_code.push_str(format!(".add_plugin({})", &plugin.name).as_str());
+            }
+        }
+
+        let mut startup_system_app_code: String = "".into();
+        for system in &self.startup_systems {
+            startup_system_app_code
+                .push_str(format!(".add_startup_system({})", &system.name).as_str());
+        }
+
+        let mut system_app_code: String = "".into();
+        for system in &self.systems {
+            system_app_code.push_str(format!(".add_system({})", &system.name).as_str());
+        }
+
+        let mut app_code_merge: String = "".to_owned();
+        app_code_merge.push_str(&plugin_app_code);
+        app_code_merge.push_str(&startup_system_app_code);
+        app_code_merge.push_str(&system_app_code);
+
+        match &self.meta.bevy_type {
+            BevyType::Plugin(name) => scope.create_plugin(Plugin{ name: name.to_string(), is_group: false, dependencies: vec![] }, &app_code_merge),
+            BevyType::PluginGroup(name) => scope.create_plugin(Plugin { name: name.to_string(), is_group: true, dependencies: vec![] }, &app_code_merge),
+            _ => scope.create_app(&app_code_merge),
+        };
+
+        for component in &self.components {
+            scope.create_component(Component { name: component.name.clone(), content: component.content.clone() });
+        }
+
+        for system in &self.startup_systems {
+            scope.create_query(system.clone());
+        }
+        for system in &self.systems {
+            scope.create_query(system.clone());
+        }
+        scope
+    }
+}
 
 trait BevyCodegen {
     fn create_app(&mut self, inner_content: &str) -> &mut Function;
