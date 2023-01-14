@@ -698,14 +698,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_potoo_editor"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "bevy_editor_pls",
-]
-
-[[package]]
 name = "bevy_ptr"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2741,6 +2733,15 @@ dependencies = [
  "crc32fast",
  "flate2",
  "miniz_oxide 0.6.2",
+]
+
+[[package]]
+name = "potoo"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_codegen",
+ "bevy_editor_pls",
 ]
 
 [[package]]

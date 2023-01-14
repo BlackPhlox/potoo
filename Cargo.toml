@@ -3,7 +3,7 @@ resolver = "2"
 members = ["bevy_codegen"]
 
 [package]
-name = "bevy_potoo_editor"
+name = "potoo"
 version = "0.1.0"
 edition = "2021"
 description = "The Cursed Editor for Bevy"
@@ -14,3 +14,4 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 bevy = "0.9.1"
 bevy_editor_pls = "0.2.0"
+bevy_codegen = { path = "bevy_codegen"}
