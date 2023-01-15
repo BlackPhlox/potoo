@@ -27,6 +27,7 @@ pub struct Meta {
     pub name: String,
     pub bevy_type: BevyType,
     pub asset_path: String,
+    pub po2_version: Po2Version,
 }
 
 impl Default for Meta {
@@ -35,7 +36,35 @@ impl Default for Meta {
             name: "bevy_default_meta".to_string(),
             bevy_type: BevyType::App,
             asset_path: "assets".to_string(),
+            po2_version: Default::default()
         }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[non_exhaustive]
+pub enum Po2Version {
+    #[default]
+    V0_0_1 = 0,
+}
+
+impl Display for Po2Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut v = format!("{:?}", self);
+        v.remove(0);
+        v = v.replace("_", ".");
+        let _ = write!(f, "{}", v);
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn converts_to_the_correct_version() {
+        assert_eq!("0.0.1", Po2Version::V0_0_1.to_string())
     }
 }
 

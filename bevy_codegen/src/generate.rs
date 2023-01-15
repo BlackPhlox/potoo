@@ -213,8 +213,6 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
 
     //Custom code
     for cc in bm.custom {
-        println!("GenType: {:?}", gen_type);
-
         match cc {
             Custom::Main(x) if gen_type.eq(&GenerationType::Main) => {
                 let path = bevy_folder.to_owned() + "/src";
@@ -334,7 +332,7 @@ impl BevyCodegen for Scope {
         for (name, ty) in &system.param {
             fun = fun.arg(name, ty);
         }
-        if system.visibility.is_empty() {
+        if !system.visibility.is_empty() {
             fun.vis(&system.visibility);
         }
         for att in &system.attributes {
