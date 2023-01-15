@@ -1,32 +1,102 @@
-use bevy::prelude::*;
+pub mod history;
+pub mod templates;
 
-#[cfg(not(feature = "reload"))]
-use systems::*;
-#[cfg(feature = "reload")]
-use systems_hot::*;
+use std::{fs, path::Path};
 
-#[cfg(feature = "reload")]
-#[hot_lib_reloader::hot_module(dylib = "systems")]
-mod systems_hot {
-    use bevy::prelude::*;
-    pub use components::*;
-    hot_functions_from_file!("systems/src/lib.rs");
-}
+use bevy::{
+    diagnostic::FrameTimeDiagnosticsPlugin, prelude::App, winit::WinitSettings, DefaultPlugins,
+};
+use bevy_codegen::{
+    generate::GenerationType, model::Component, templates::default_cargo_src_template,
+};
+use bevy_editor_pls::prelude::*;
+use codegen::Scope;
+use history::{PotooEvents, ProjectModel};
+use rust_format::{Formatter, RustFmt};
+use templates::default_game_template;
+use undo::History;
 
 fn main() {
-    let mut app = App::new();
-    app.add_plugins(DefaultPlugins)
-        .add_startup_system(systems::setup)
-        .add_system_set(
-            SystemSet::new()
-                .with_system(player_movement_system)
-                .with_system(player_shooting_system)
-                .with_system(bullet_movement_system)
-                .with_system(bullet_hit_system)
-                .with_system(spawn_other_ships)
-                .with_system(move_other_ships),
-        )
-        .add_system(bevy::window::close_on_esc);
+    let run_app = false;
+    if run_app {
+        App::new()
+            .add_plugins(DefaultPlugins)
+            .add_plugin(EditorPlugin)
+            .insert_resource(WinitSettings::desktop_app())
+            .add_plugin(FrameTimeDiagnosticsPlugin)
+            .run();
+    }
 
-    app.run();
+    let bm = default_game_template();
+    let mut pm = ProjectModel {
+        model: bm,
+        history: History::new(),
+    };
+
+    pm.apply(PotooEvents(history::PotooEvent::Component(Component {
+        name: "OtherShip".to_string(),
+        ..Default::default()
+    })));
+
+    pm.apply(PotooEvents(history::PotooEvent::Component(Component {
+        name: "Bullet".to_string(),
+        ..Default::default()
+    })));
+
+    let display_info = false;
+
+    if display_info {
+        println!("Raw:\n");
+        println!("{:?}\n", pm.model);
+
+        println!("Simplified Pretty:\n");
+        println!("{}\n", pm.model);
+    }
+
+    //Write to file
+    let bevy_folder = pm.model.meta.name.clone();
+    let already_exists = Path::new(&bevy_folder).exists();
+    if already_exists {
+        remove_path(bevy_folder.to_string() + "/" + "Cargo.toml");
+        remove_path(bevy_folder.to_string() + "/" + "src");
+        remove_path(bevy_folder.to_string() + "/" + "components");
+        remove_path(bevy_folder + "/" + "systems");
+    }
+
+    //Remove whole project
+    //let res = fs::remove_dir_all(bevy_folder.to_owned());
+
+    let _ = pm.model.generate(GenerationType::Main);
+    let _ = pm.model.generate(GenerationType::Components);
+    let _ = pm.model.generate(GenerationType::Systems);
+
+    if display_info {
+        println!("Codegen format:\n");
+        let cg = pm.model.generate_code(Scope::new(), GenerationType::All);
+        println!("{:?}\n", cg);
+
+        println!("Codegen result:\n");
+        let res = cg.to_string();
+        println!("{:?}\n", res);
+
+        println!("Prettified Codegen result:\n");
+        let pretty_res = RustFmt::default().format_str(res).unwrap();
+        println!("{:?}\n", pretty_res);
+
+        println!("Cargo Toml:\n");
+        let toml = default_cargo_src_template(&pm.model);
+        println!("{:?}\n", toml);
+    }
+}
+
+fn remove_path(path: String) {
+    let already_exists = Path::new(&path).exists();
+    let is_dir = Path::new(&path).is_dir();
+    if already_exists {
+        if is_dir {
+            let _ = fs::remove_dir_all(&path);
+        } else {
+            let _ = fs::remove_file(&path);
+        }
+    }
 }

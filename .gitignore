@@ -1,6 +1,7 @@
 target
-Cargo.lock
-/assets
+# Cargo.lock
 
 .idea
 /target-bin/
+
+/bevy_test

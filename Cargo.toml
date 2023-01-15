@@ -1,34 +1,20 @@
 [workspace]
 resolver = "2"
-members = ["systems", "components"]
+members = ["bevy_codegen"]
 
 [package]
 name = "potoo"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 description = "The Cursed Editor for Bevy"
 license = "MIT OR Apache-2.0"
 
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [dependencies]
-bevy = "0.9.1-dev"
-components = { path = "components" }
-hot-lib-reloader = { version = "0.6.4", optional = true }
-rand = "0.8.5"
-systems = { path = "systems" }
-
-[features]
-default = []
-reload = [
-  "dep:hot-lib-reloader",
-  # Make sure that the types don't change:
-  "components/dynamic",
-  # This is important on windows for avoiding file locking issues:
-  "bevy/dynamic",
-]
-
-[profile.dev]
-opt-level = 1
-
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
-[profile.dev.package."*"]
-opt-level = 3
+bevy = "0.9.1"
+bevy_editor_pls = "0.2.0"
+codegen = "0.2"
+bevy_codegen = { path = "bevy_codegen"}
+undo = "0.48"
+rust-format = "0.3.4"
