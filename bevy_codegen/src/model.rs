@@ -25,6 +25,7 @@ pub enum BevyType {
 pub struct Meta {
     pub name: String,
     pub bevy_type: BevyType,
+    pub asset_path: String,
 }
 
 impl Default for Meta {
@@ -32,6 +33,7 @@ impl Default for Meta {
         Self {
             name: "bevy_default_meta".to_string(),
             bevy_type: BevyType::App,
+            asset_path: "assets".to_string()
         }
     }
 }

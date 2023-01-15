@@ -1,7 +1,7 @@
 use std::{
     fs::{self, File},
     io::{self, Write},
-    path::Path,
+    path::Path, fmt,
 };
 
 use codegen::{Field, Function, Scope, Struct};
@@ -160,6 +160,12 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
     fs::create_dir_all(path.clone())?;
     let mut bevy_lib_file = File::create(path + bevy_type_filename)?;
 
+    if gen_type.eq(&GenerationType::Systems) {
+        for cc in &bm.custom {
+            let _ = bevy_lib_file.write((format!("mod {};\n", cc.name.replace(".rs", ""))).as_bytes());
+        }
+        let _ = bevy_lib_file.write("\n".as_bytes());
+    }
     //Add bevy prelude
     let _ = bevy_lib_file.write(("use bevy::prelude::*;\n").as_bytes());
 
@@ -201,6 +207,9 @@ mod systems_hot {
             let r = cc_file.write((cc.content).as_bytes());    
             println!("Result: {:?}", r);
         }
+
+        //Assets
+        let _ = copy_dir_all(bm.meta.asset_path, bevy_folder.to_owned() + "/assets");
     }
 
     if bm.meta.bevy_type.eq(&BevyType::App)
@@ -209,6 +218,21 @@ mod systems_hot {
         let _ = bevy_lib_file.write(("#[bevy_main]\n").as_bytes());
     }
     Ok(bevy_lib_file)
+}
+
+// https://stackoverflow.com/questions/26958489/how-to-copy-a-folder-recursively-in-rust
+fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+    fs::create_dir_all(&dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let ty = entry.file_type()?;
+        if ty.is_dir() {
+            copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        } else {
+            fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        }
+    }
+    Ok(())
 }
 
 trait BevyCodegen {
