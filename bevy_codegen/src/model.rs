@@ -44,10 +44,31 @@ pub struct System {
     pub attributes: Vec<String>,
 }
 
+impl Default for System {
+    fn default() -> Self {
+        Self {
+            name: "test_system".to_string(),
+            param: vec![],
+            content: r#"println("Hello World")"#.to_string(),
+            visibility: Default::default(),
+            attributes: Default::default(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Component {
     pub name: String,
     pub content: Vec<(String, String)>,
+}
+
+impl Default for Component {
+    fn default() -> Self {
+        Self {
+            name: "TestComponent".to_string(),
+            content: Default::default(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -55,6 +76,16 @@ pub struct Plugin {
     pub name: String,
     pub is_group: bool,
     pub dependencies: Vec<PluginDependency>,
+}
+
+impl Default for Plugin {
+    fn default() -> Self {
+        Self {
+            name: "DefaultPlugins".to_string(),
+            is_group: true,
+            dependencies: Default::default(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]

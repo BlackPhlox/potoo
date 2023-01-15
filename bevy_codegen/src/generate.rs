@@ -1,6 +1,6 @@
 use std::{
     fs::{self, File},
-    io::Write,
+    io::{self, Write},
     path::Path,
 };
 
@@ -9,7 +9,10 @@ use rust_format::{Formatter, RustFmt};
 
 use crate::{
     model::{BevyModel, BevyType, Component, Plugin, System},
-    templates::{default_cargo_components_template, default_cargo_src_template},
+    templates::{
+        default_cargo_components_template, default_cargo_src_template,
+        default_cargo_systems_template,
+    },
 };
 
 #[derive(Copy, Clone, PartialEq, Eq)]
@@ -103,43 +106,48 @@ impl BevyModel {
     }
 
     pub fn generate(&self, gen_type: GenerationType) -> std::io::Result<()> {
-        let bevy_folder = self.meta.name.clone();
-        let already_exists = Path::new(&bevy_folder).exists();
-
-        if let Ok(mut bevy_lib_file) = generate_structure(already_exists, self.clone(), gen_type) {
+        let res = generate_structure(self.clone(), gen_type);
+        if let Ok(mut bevy_lib_file) = res {
+            println!("Structure done");
             let r = RustFmt::default()
                 .format_str(self.generate_code(Scope::new(), gen_type).to_string())
                 .unwrap();
+            println!("Test: {:?}", r);
             bevy_lib_file.write_all(r.as_bytes())?;
+        } else {
+            println!("115: {:?}", res);
         }
 
         Ok(())
     }
 }
 
-fn generate_structure(
-    already_exists: bool,
-    bm: BevyModel,
-    gen_type: GenerationType,
-) -> std::io::Result<File> {
+fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Result<File> {
     let folder = match gen_type {
-        GenerationType::Components => "components",
-        GenerationType::Systems => "systems",
-        _ => "src",
+        GenerationType::Components => "components/",
+        GenerationType::Systems => "systems/",
+        _ => "",
     };
     let bevy_folder = bm.meta.name.clone();
-    if already_exists {
-        fs::remove_dir_all(bevy_folder.to_owned() + "/" + folder)?;
-        let _rf = fs::remove_file(bevy_folder.to_owned() + "/Cargo.toml");
-    } else {
-        fs::create_dir(&bevy_folder)?;
-    }
-
-    fs::create_dir(bevy_folder.to_owned() + "/" + folder)?;
-
+    let _ = fs::create_dir(&bevy_folder);
+    if folder.len() != 0 {
+        fs::create_dir(bevy_folder.to_owned() + "/" + folder)?
+    };
     //Write cargo toml
-    let mut cargo_file = File::create(bevy_folder.to_owned() + "/Cargo.toml")?;
-    cargo_file.write_all(default_cargo_src_template(&bm).as_bytes())?;
+    let cargo_path = match gen_type {
+        GenerationType::Components => bevy_folder.to_owned() + "/" + folder,
+        GenerationType::Systems => bevy_folder.to_owned() + "/" + folder,
+        _ => bevy_folder.to_string(),
+    };
+
+    let mut cargo_file = File::create(cargo_path + "/Cargo.toml")?;
+    let buf = match gen_type {
+        GenerationType::All => todo!(),
+        GenerationType::Main => default_cargo_src_template(&bm),
+        GenerationType::Components => default_cargo_components_template(),
+        GenerationType::Systems => default_cargo_systems_template(),
+    };
+    cargo_file.write_all(buf.as_bytes())?;
 
     //Write plugin or main/game
     let bevy_type_filename = match (bm.meta.clone().bevy_type, gen_type) {
@@ -148,8 +156,39 @@ fn generate_structure(
         (_, _) => "/lib.rs",
     };
 
-    let mut bevy_lib_file =
-        File::create(bevy_folder.to_owned() + "/" + folder + bevy_type_filename)?;
+    let path = bevy_folder.to_owned() + "/" + folder + "src";
+    println!("{}", path.clone());
+    fs::create_dir(path.clone())?;
+    let mut bevy_lib_file = File::create(path + bevy_type_filename)?;
+
+    //Add bevy prelude
+    let _ = bevy_lib_file.write(("use bevy::prelude::*;\n").as_bytes());
+
+    if gen_type.eq(&GenerationType::Systems) {
+        let _ = bevy_lib_file.write(("use components::*;\n\n").as_bytes());
+    } else {
+        let _ = bevy_lib_file.write(("\n").as_bytes());
+    }
+
+    if gen_type.eq(&GenerationType::Main) {
+        let _ = bevy_lib_file.write(
+            (r#"#[cfg(not(feature = "reload"))]
+use systems::*;
+#[cfg(feature = "reload")]
+use systems_hot::*;
+        
+#[cfg(feature = "reload")]
+#[hot_lib_reloader::hot_module(dylib = "systems")]
+mod systems_hot {
+    use bevy::prelude::*;
+    pub use components::*;
+    hot_functions_from_file!("systems/src/lib.rs");
+}
+
+"#)
+            .as_bytes(),
+        );
+    }
 
     if bm.meta.bevy_type.eq(&BevyType::App)
         && (gen_type.eq(&GenerationType::Main) || gen_type.eq(&GenerationType::All))
@@ -208,8 +247,11 @@ impl BevyCodegen for Scope {
 
     fn create_component(&mut self, component: Component) -> &mut Struct {
         let a = self.new_struct(&component.name);
+        a.vis("pub");
         for (n, t) in component.content.iter() {
-            a.push_field(Field::new(n, t));
+            let mut f = Field::new(n, t);
+            f.vis("pub");
+            a.push_field(f);
         }
         a.derive("Component")
     }

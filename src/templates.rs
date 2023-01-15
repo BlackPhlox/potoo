@@ -33,12 +33,12 @@ pub fn default_game_template() -> BevyModel {
         ],
         content: r#"
 
-commands.spawn_bundle(Camera2dBundle::default());
+commands.spawn(Camera2dBundle::default());
 
 // player
 let ship_handle = asset_server.load("ship_C.png");
 commands
-.spawn_bundle(SpriteBundle {
+.spawn(SpriteBundle {
     texture: ship_handle,
     ..default()
 })
