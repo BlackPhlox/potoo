@@ -35,8 +35,14 @@ fn main() {
         model: bm,
         history: History::new(),
     };
+
     pm.apply(PotooEvents(history::PotooEvent::Component(Component {
-        name: "Hello".to_string(),
+        name: "OtherShip".to_string(),
+        ..Default::default()
+    })));
+
+    pm.apply(PotooEvents(history::PotooEvent::Component(Component {
+        name: "Bullet".to_string(),
         ..Default::default()
     })));
 
@@ -86,8 +92,7 @@ fn main() {
     */
 }
 
-
-fn remove_path(path: String){
+fn remove_path(path: String) {
     let already_exists = Path::new(&path).exists();
     let is_dir = Path::new(&path).is_dir();
     if already_exists {

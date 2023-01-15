@@ -1,4 +1,6 @@
-use bevy_codegen::model::{BevyModel, BevyType, Component, Feature, Meta, Plugin, System};
+use bevy_codegen::model::{
+    BevyModel, BevyType, Component, CustomCode, Feature, Meta, Plugin, System,
+};
 
 pub fn default_game_template() -> BevyModel {
     let mut bevy_model = BevyModel {
@@ -64,6 +66,18 @@ commands
         attributes: vec!["no_mangle".to_string()],
     };
     bevy_model.startup_systems.push(hw_system);
+
+    bevy_model.custom.push(CustomCode {
+        name: "utilities.rs".to_string(),
+        path: "systems/src/".to_string(),
+        content: r#"use bevy::prelude::*;
+        
+pub(crate) fn is_outside_bounds(point: Vec2, bounds: (f32, f32, f32, f32)) -> bool {
+    let (left, top, right, bottom) = bounds;
+    point.x < left || point.x > right || point.y < bottom || point.y > top
+}"#
+        .to_string(),
+    });
 
     //Dynamic Lib for fast reload
     bevy_model.bevy_settings.features.push(Feature::Dynamic);

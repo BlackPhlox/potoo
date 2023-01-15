@@ -131,7 +131,7 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
     let bevy_folder = bm.meta.name.clone();
     let _ = fs::create_dir(&bevy_folder);
     if folder.len() != 0 {
-        fs::create_dir(bevy_folder.to_owned() + "/" + folder)?
+        fs::create_dir_all(bevy_folder.to_owned() + "/" + folder)?
     };
     //Write cargo toml
     let cargo_path = match gen_type {
@@ -157,8 +157,7 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
     };
 
     let path = bevy_folder.to_owned() + "/" + folder + "src";
-    println!("{}", path.clone());
-    fs::create_dir(path.clone())?;
+    fs::create_dir_all(path.clone())?;
     let mut bevy_lib_file = File::create(path + bevy_type_filename)?;
 
     //Add bevy prelude
@@ -188,6 +187,20 @@ mod systems_hot {
 "#)
             .as_bytes(),
         );
+
+        //Custom code
+        for cc in bm.custom {
+            //println!("Name: {}", cc.name);
+            //println!("Path: {}", cc.path);
+            let path = bevy_folder.to_owned() + "/" + &cc.path;
+            println!("path: {}", path);
+            let full_path = path.to_string() + &cc.name;
+            fs::create_dir_all(path)?;
+            println!("full_path: {}", full_path);
+            let mut cc_file = File::create(full_path)?;
+            let r = cc_file.write((cc.content).as_bytes());    
+            println!("Result: {:?}", r);
+        }
     }
 
     if bm.meta.bevy_type.eq(&BevyType::App)

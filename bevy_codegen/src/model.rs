@@ -11,6 +11,7 @@ pub struct BevyModel {
     pub bevy_settings: Settings,
     pub meta: Meta,
     pub examples: Vec<BevyModel>,
+    pub custom: Vec<CustomCode>,
 }
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
@@ -76,6 +77,13 @@ pub struct Plugin {
     pub name: String,
     pub is_group: bool,
     pub dependencies: Vec<PluginDependency>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CustomCode {
+    pub name: String,
+    pub path: String,
+    pub content: String,
 }
 
 impl Default for Plugin {
