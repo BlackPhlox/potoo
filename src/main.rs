@@ -11,7 +11,7 @@ use bevy::{
 };
 use bevy_codegen::{
     generate::GenerationType,
-    model::{BevyModel, Component},
+    model::{BevyModel, Component, Plugin},
     templates::default_cargo_src_template,
 };
 use bevy_editor_pls::{controls, prelude::*};

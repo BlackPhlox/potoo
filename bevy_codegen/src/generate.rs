@@ -1,21 +1,21 @@
 use std::{
     fs::{self, File},
     io::{self, Write},
-    path::Path, fmt,
+    path::Path,
 };
 
 use codegen::{Field, Function, Scope, Struct};
 use rust_format::{Formatter, RustFmt};
 
 use crate::{
-    model::{BevyModel, BevyType, Component, Plugin, System},
+    model::{BevyModel, BevyType, Component, Custom, Import, Plugin, System, Used},
     templates::{
         default_cargo_components_template, default_cargo_src_template,
         default_cargo_systems_template,
     },
 };
 
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum GenerationType {
     All,
     Main,
@@ -108,18 +108,26 @@ impl BevyModel {
     pub fn generate(&self, gen_type: GenerationType) -> std::io::Result<()> {
         let res = generate_structure(self.clone(), gen_type);
         if let Ok(mut bevy_lib_file) = res {
-            println!("Structure done");
+            //println!("Structure done");
             let r = RustFmt::default()
                 .format_str(self.generate_code(Scope::new(), gen_type).to_string())
                 .unwrap();
-            println!("Test: {:?}", r);
+            //println!("Test: {:?}", r);
             bevy_lib_file.write_all(r.as_bytes())?;
         } else {
-            println!("115: {:?}", res);
+            println!("Generate.rs 119: {:?}", res);
         }
 
         Ok(())
     }
+}
+
+fn import_format(import: Import) -> String {
+    let name = import.dependency.crate_name;
+    let ps = import.dependency.crate_paths;
+    let a = "{".to_string() + &ps.join(", ") + "}";
+    let s = format!("use {}::{};\n", &name, a);
+    s
 }
 
 fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Result<File> {
@@ -160,19 +168,86 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
     fs::create_dir_all(path.clone())?;
     let mut bevy_lib_file = File::create(path + bevy_type_filename)?;
 
-    if gen_type.eq(&GenerationType::Systems) {
-        for cc in &bm.custom {
-            let _ = bevy_lib_file.write((format!("mod {};\n", cc.name.replace(".rs", ""))).as_bytes());
+    for cc in &bm.custom {
+        match cc {
+            Custom::Main(x) if gen_type.eq(&GenerationType::Main) => {
+                let _ = bevy_lib_file
+                    .write((format!("mod {};\n", x.name.replace(".rs", ""))).as_bytes());
+            }
+            Custom::Component(x) if gen_type.eq(&GenerationType::Components) => {
+                let _ = bevy_lib_file
+                    .write((format!("mod {};\n", x.name.replace(".rs", ""))).as_bytes());
+            }
+            Custom::System(x) if gen_type.eq(&GenerationType::Systems) => {
+                let _ = bevy_lib_file
+                    .write((format!("mod {};\n", x.name.replace(".rs", ""))).as_bytes());
+            }
+            _ => (),
         }
-        let _ = bevy_lib_file.write("\n".as_bytes());
     }
+    let _ = bevy_lib_file.write("\n".as_bytes());
+
     //Add bevy prelude
     let _ = bevy_lib_file.write(("use bevy::prelude::*;\n").as_bytes());
+
+    for imp in bm.imports {
+        match imp.used {
+            Used::Main if gen_type.eq(&GenerationType::Main) => {
+                let _ = bevy_lib_file.write((import_format(imp)).as_bytes());
+            }
+            Used::Components if gen_type.eq(&GenerationType::Components) => {
+                let _ = bevy_lib_file.write((import_format(imp)).as_bytes());
+            }
+            Used::Systems if gen_type.eq(&GenerationType::Systems) => {
+                let _ = bevy_lib_file.write((import_format(imp)).as_bytes());
+            }
+            _ => ()
+        }
+    }
 
     if gen_type.eq(&GenerationType::Systems) {
         let _ = bevy_lib_file.write(("use components::*;\n\n").as_bytes());
     } else {
         let _ = bevy_lib_file.write(("\n").as_bytes());
+    }
+
+    //Custom code
+    for cc in bm.custom {
+        println!("GenType: {:?}", gen_type);
+        
+        match cc {
+            Custom::Main(x) if gen_type.eq(&GenerationType::Main) => {
+                let path = bevy_folder.to_owned() + "/src";
+                println!("path: {}", path);
+                let full_path = path.to_string() + &x.name;
+                fs::create_dir_all(path)?;
+                println!("full_path: {}", full_path);
+                let mut cc_file = File::create(full_path)?;
+                let r = cc_file.write((x.content).as_bytes());
+                println!("Result: {:?}", r);
+            }
+            Custom::Component(x) if gen_type.eq(&GenerationType::Components) => {
+                let path = bevy_folder.to_owned() + "/components/src";
+                println!("path: {}", path);
+                let full_path = path.to_string() + "/" + &x.name;
+                fs::create_dir_all(path)?;
+                println!("full_path: {}", full_path);
+                let mut cc_file = File::create(full_path)?;
+                let r = cc_file.write((x.content).as_bytes());
+                println!("Result: {:?}", r);
+            }
+            Custom::System(x) if gen_type.eq(&GenerationType::Systems) => {
+                let path = bevy_folder.to_owned() + "/systems/src";
+                println!("path: {}", path);
+                let full_path = path.to_string() + "/" + &x.name;
+                fs::create_dir_all(path)?;
+                println!("full_path: {}", full_path);
+                let mut cc_file = File::create(full_path)?;
+                let r = cc_file.write((x.content).as_bytes());
+                println!("Result: {:?}", r);
+            }
+            _ => ()
+        }
     }
 
     if gen_type.eq(&GenerationType::Main) {
@@ -193,20 +268,6 @@ mod systems_hot {
 "#)
             .as_bytes(),
         );
-
-        //Custom code
-        for cc in bm.custom {
-            //println!("Name: {}", cc.name);
-            //println!("Path: {}", cc.path);
-            let path = bevy_folder.to_owned() + "/" + &cc.path;
-            println!("path: {}", path);
-            let full_path = path.to_string() + &cc.name;
-            fs::create_dir_all(path)?;
-            println!("full_path: {}", full_path);
-            let mut cc_file = File::create(full_path)?;
-            let r = cc_file.write((cc.content).as_bytes());    
-            println!("Result: {:?}", r);
-        }
 
         //Assets
         let _ = copy_dir_all(bm.meta.asset_path, bevy_folder.to_owned() + "/assets");

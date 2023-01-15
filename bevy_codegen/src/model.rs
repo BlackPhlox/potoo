@@ -11,7 +11,8 @@ pub struct BevyModel {
     pub bevy_settings: Settings,
     pub meta: Meta,
     pub examples: Vec<BevyModel>,
-    pub custom: Vec<CustomCode>,
+    pub custom: Vec<Custom>,
+    pub imports: Vec<Import>,
 }
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
@@ -33,7 +34,7 @@ impl Default for Meta {
         Self {
             name: "bevy_default_meta".to_string(),
             bevy_type: BevyType::App,
-            asset_path: "assets".to_string()
+            asset_path: "assets".to_string(),
         }
     }
 }
@@ -52,9 +53,9 @@ impl Default for System {
         Self {
             name: "test_system".to_string(),
             param: vec![],
-            content: r#"println("Hello World")"#.to_string(),
-            visibility: Default::default(),
-            attributes: Default::default(),
+            content: r#"println("Hello Bevy!")"#.to_string(),
+            attributes: vec!["no_mangle".to_string()],
+            visibility: "pub".to_string(),
         }
     }
 }
@@ -78,13 +79,19 @@ impl Default for Component {
 pub struct Plugin {
     pub name: String,
     pub is_group: bool,
-    pub dependencies: Vec<PluginDependency>,
+    pub dependencies: Vec<CrateDependency>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub enum Custom {
+    Main(CustomCode),
+    Component(CustomCode),
+    System(CustomCode),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CustomCode {
     pub name: String,
-    pub path: String,
     pub content: String,
 }
 
@@ -99,10 +106,29 @@ impl Default for Plugin {
 }
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
-pub struct PluginDependency {
+pub struct CrateDependency {
     pub crate_name: String,
     pub crate_version: String,
     pub crate_paths: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub enum Used {
+    Main,
+    Components,
+    Systems,
+}
+
+impl Default for Used {
+    fn default() -> Self {
+        Used::Main
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Default, Debug)]
+pub struct Import {
+    pub used: Used,
+    pub dependency: CrateDependency,
 }
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
