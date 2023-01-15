@@ -1,5 +1,5 @@
-pub mod templates;
 pub mod history;
+pub mod templates;
 
 use bevy::{
     diagnostic::FrameTimeDiagnosticsPlugin,
@@ -7,12 +7,17 @@ use bevy::{
     winit::WinitSettings,
     DefaultPlugins,
 };
-use bevy_codegen::model::{BevyModel, Component};
+use bevy_codegen::{
+    generate::GenerationType,
+    model::{BevyModel, Component},
+    templates::default_cargo_src_template,
+};
 use bevy_editor_pls::{controls, prelude::*};
-use history::{ProjectModel, PotooEvents};
+use codegen::Scope;
+use history::{PotooEvents, ProjectModel};
+use rust_format::{Formatter, RustFmt};
 use templates::default_game_template;
 use undo::History;
-use rust_format::{RustFmt, Formatter};
 
 fn main() {
     /*App::new()
@@ -22,11 +27,17 @@ fn main() {
         .add_plugin(FrameTimeDiagnosticsPlugin)
         .run();
     */
-    
+
     let bm = default_game_template();
-    let mut pm = ProjectModel{ model: bm, history: History::new() };
-    pm.apply(PotooEvents(history::PotooEvent::Component(Component { name: "Hello".to_string(), content: vec![] })));
-    
+    let mut pm = ProjectModel {
+        model: bm,
+        history: History::new(),
+    };
+    pm.apply(PotooEvents(history::PotooEvent::Component(Component {
+        name: "Hello".to_string(),
+        content: vec![],
+    })));
+
     println!("Raw:\n");
     println!("{:?}\n", pm.model);
 
@@ -34,8 +45,15 @@ fn main() {
     println!("{}\n", pm.model);
 
     println!("Codegen format:\n");
-    let cg = pm.model.generate();
+    let cg = pm
+        .model
+        .generate_code(Scope::new(), GenerationType::All);
     println!("{:?}\n", cg);
+
+    //Write to file
+    let _ = pm.model.generate(GenerationType::Main);
+    let _ = pm.model.generate(GenerationType::Components);
+    let _ = pm.model.generate(GenerationType::Systems);
 
     println!("Codegen result:\n");
     let res = cg.to_string();
@@ -45,16 +63,7 @@ fn main() {
     let pretty_res = RustFmt::default().format_str(res).unwrap();
     println!("{:?}\n", pretty_res);
 
-    write_src_folder();
-    write_components_folder();
-    write_systems_folder();
-    write_outer_cargo();
+    println!("Cargo Toml:\n");
+    let toml = default_cargo_src_template(&pm.model);
+    println!("{:?}\n", toml);
 }
-
-fn write_outer_cargo() {}
-
-fn write_src_folder() {}
-
-fn write_components_folder() {}
-
-fn write_systems_folder() {}

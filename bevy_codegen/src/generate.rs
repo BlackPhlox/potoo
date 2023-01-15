@@ -1,59 +1,162 @@
+use std::{
+    fs::{self, File},
+    io::Write,
+    path::Path,
+};
+
 use codegen::{Field, Function, Scope, Struct};
 use rust_format::{Formatter, RustFmt};
 
-use crate::model::{Component, Plugin, System, BevyType, BevyModel};
+use crate::{
+    model::{BevyModel, BevyType, Component, Plugin, System},
+    templates::{default_cargo_components_template, default_cargo_src_template},
+};
+
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub enum GenerationType {
+    All,
+    Main,
+    Components,
+    Systems,
+}
 
 impl BevyModel {
-    pub fn generate(&self) -> Scope {
-        let mut scope = Scope::new();
+    pub fn generate_code(&self, mut scope: Scope, gen_type: GenerationType) -> Scope {
+        match gen_type {
+            GenerationType::Main => {
+                let mut plugin_app_code: String = "".into();
+                for plugin in &self.plugins {
+                    if plugin.is_group {
+                        plugin_app_code
+                            .push_str(format!(".add_plugins({})", &plugin.name).as_str());
+                    } else {
+                        plugin_app_code.push_str(format!(".add_plugin({})", &plugin.name).as_str());
+                    }
+                }
 
-        if self.meta.bevy_type.eq(&BevyType::Example) {
-            scope.import("bevy_test", "BevyTest");
-        }
+                let mut startup_system_app_code: String = "".into();
+                for system in &self.startup_systems {
+                    startup_system_app_code
+                        .push_str(format!(".add_startup_system({})", &system.name).as_str());
+                }
 
-        let mut plugin_app_code: String = "".into();
-        for plugin in &self.plugins {
-            if plugin.is_group {
-                plugin_app_code.push_str(format!(".add_plugins({})", &plugin.name).as_str());
-            } else {
-                plugin_app_code.push_str(format!(".add_plugin({})", &plugin.name).as_str());
+                let mut system_app_code: String = "".into();
+                for system in &self.systems {
+                    system_app_code.push_str(format!(".add_system({})", &system.name).as_str());
+                }
+
+                let mut app_code_merge: String = "".to_owned();
+                app_code_merge.push_str(&plugin_app_code);
+                app_code_merge.push_str(&startup_system_app_code);
+                app_code_merge.push_str(&system_app_code);
+
+                match &self.meta.bevy_type {
+                    BevyType::Plugin(name) => scope.create_plugin(
+                        Plugin {
+                            name: name.to_string(),
+                            is_group: false,
+                            dependencies: vec![],
+                        },
+                        &app_code_merge,
+                    ),
+                    BevyType::PluginGroup(name) => scope.create_plugin(
+                        Plugin {
+                            name: name.to_string(),
+                            is_group: true,
+                            dependencies: vec![],
+                        },
+                        &app_code_merge,
+                    ),
+                    _ => scope.create_app(&app_code_merge),
+                };
+            }
+            GenerationType::Components => {
+                for component in &self.components {
+                    scope.create_component(Component {
+                        name: component.name.clone(),
+                        content: component.content.clone(),
+                    });
+                }
+            }
+            GenerationType::Systems => {
+                for system in &self.startup_systems {
+                    scope.create_query(system.clone());
+                }
+
+                for system in &self.systems {
+                    scope.create_query(system.clone());
+                }
+            }
+            GenerationType::All => {
+                let mut main_scope = self.generate_code(scope, GenerationType::Main);
+                main_scope = self.generate_code(main_scope, GenerationType::Components);
+                main_scope = self.generate_code(main_scope, GenerationType::Systems);
+                return main_scope;
             }
         }
 
-        let mut startup_system_app_code: String = "".into();
-        for system in &self.startup_systems {
-            startup_system_app_code
-                .push_str(format!(".add_startup_system({})", &system.name).as_str());
-        }
+        /*if self.meta.bevy_type.eq(&BevyType::Example) {
+            scope.import("bevy_test", "BevyTest");
+        }*/
 
-        let mut system_app_code: String = "".into();
-        for system in &self.systems {
-            system_app_code.push_str(format!(".add_system({})", &system.name).as_str());
-        }
-
-        let mut app_code_merge: String = "".to_owned();
-        app_code_merge.push_str(&plugin_app_code);
-        app_code_merge.push_str(&startup_system_app_code);
-        app_code_merge.push_str(&system_app_code);
-
-        match &self.meta.bevy_type {
-            BevyType::Plugin(name) => scope.create_plugin(Plugin{ name: name.to_string(), is_group: false, dependencies: vec![] }, &app_code_merge),
-            BevyType::PluginGroup(name) => scope.create_plugin(Plugin { name: name.to_string(), is_group: true, dependencies: vec![] }, &app_code_merge),
-            _ => scope.create_app(&app_code_merge),
-        };
-
-        for component in &self.components {
-            scope.create_component(Component { name: component.name.clone(), content: component.content.clone() });
-        }
-
-        for system in &self.startup_systems {
-            scope.create_query(system.clone());
-        }
-        for system in &self.systems {
-            scope.create_query(system.clone());
-        }
         scope
     }
+
+    pub fn generate(&self, gen_type: GenerationType) -> std::io::Result<()> {
+        let bevy_folder = self.meta.name.clone();
+        let already_exists = Path::new(&bevy_folder).exists();
+
+        if let Ok(mut bevy_lib_file) = generate_structure(already_exists, self.clone(), gen_type) {
+            let r = RustFmt::default()
+                .format_str(self.generate_code(Scope::new(), gen_type).to_string())
+                .unwrap();
+            bevy_lib_file.write_all(r.as_bytes())?;
+        }
+
+        Ok(())
+    }
+}
+
+fn generate_structure(
+    already_exists: bool,
+    bm: BevyModel,
+    gen_type: GenerationType,
+) -> std::io::Result<File> {
+    let folder = match gen_type {
+        GenerationType::Components => "components",
+        GenerationType::Systems => "systems",
+        _ => "src",
+    };
+    let bevy_folder = bm.meta.name.clone();
+    if already_exists {
+        fs::remove_dir_all(bevy_folder.to_owned() + "/" + folder)?;
+        let _rf = fs::remove_file(bevy_folder.to_owned() + "/Cargo.toml");
+    } else {
+        fs::create_dir(&bevy_folder)?;
+    }
+
+    fs::create_dir(bevy_folder.to_owned() + "/" + folder)?;
+
+    //Write cargo toml
+    let mut cargo_file = File::create(bevy_folder.to_owned() + "/Cargo.toml")?;
+    cargo_file.write_all(default_cargo_src_template(&bm).as_bytes())?;
+
+    //Write plugin or main/game
+    let bevy_type_filename = match (bm.meta.clone().bevy_type, gen_type) {
+        (BevyType::App, GenerationType::Main) => "/main.rs",
+        (BevyType::App, GenerationType::All) => "/main.rs",
+        (_, _) => "/lib.rs",
+    };
+
+    let mut bevy_lib_file =
+        File::create(bevy_folder.to_owned() + "/" + folder + bevy_type_filename)?;
+
+    if bm.meta.bevy_type.eq(&BevyType::App)
+        && (gen_type.eq(&GenerationType::Main) || gen_type.eq(&GenerationType::All))
+    {
+        let _ = bevy_lib_file.write(("#[bevy_main]\n").as_bytes());
+    }
+    Ok(bevy_lib_file)
 }
 
 trait BevyCodegen {

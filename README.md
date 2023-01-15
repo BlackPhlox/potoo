@@ -12,7 +12,7 @@
 
 The Cursed Editor for [Bevy](https://bevyengine.org).
 
-A code first editor that allows you to export your plugin or game project to code.
+A code-first editor that allows you to export your plugin or game project to code.
 
 Currently [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor) is being migrated into `potoo` and focusing on getting the [bevy_editor_pls](https://github.com/jakobhellermann/bevy_editor_pls) dependency working for bevy `0.9` and hot-reloading with the editor.
 

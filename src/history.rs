@@ -1,8 +1,9 @@
 use bevy::ecs::component;
-use bevy_codegen::model::{Component, BevyModel};
-use undo::{History, Action};
+use bevy_codegen::model::{BevyModel, Component};
+use undo::{Action, History};
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum PotooEvent {
     Component(Component),
 }
@@ -11,7 +12,7 @@ pub enum PotooEvent {
 pub struct PotooEvents(pub PotooEvent);
 
 impl ProjectModel {
-    pub fn apply(&mut self, add : PotooEvents){
+    pub fn apply(&mut self, add: PotooEvents) {
         self.history.apply(&mut self.model, add);
     }
 
@@ -41,11 +42,10 @@ impl Action for PotooEvents {
             PotooEvent::Component(_) => target.components.pop(),
         };
     }
-
 }
 
 #[derive(Debug)]
 pub struct ProjectModel {
     pub model: BevyModel,
-    pub history: History<PotooEvents>
+    pub history: History<PotooEvents>,
 }
