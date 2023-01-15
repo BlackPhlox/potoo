@@ -138,7 +138,7 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
     };
     let bevy_folder = bm.meta.name.clone();
     let _ = fs::create_dir(&bevy_folder);
-    if folder.len() != 0 {
+    if !folder.is_empty() {
         fs::create_dir_all(bevy_folder.to_owned() + "/" + folder)?
     };
     //Write cargo toml
@@ -201,7 +201,7 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
             Used::Systems if gen_type.eq(&GenerationType::Systems) => {
                 let _ = bevy_lib_file.write((import_format(imp)).as_bytes());
             }
-            _ => ()
+            _ => (),
         }
     }
 
@@ -214,7 +214,7 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
     //Custom code
     for cc in bm.custom {
         println!("GenType: {:?}", gen_type);
-        
+
         match cc {
             Custom::Main(x) if gen_type.eq(&GenerationType::Main) => {
                 let path = bevy_folder.to_owned() + "/src";
@@ -246,7 +246,7 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
                 let r = cc_file.write((x.content).as_bytes());
                 println!("Result: {:?}", r);
             }
-            _ => ()
+            _ => (),
         }
     }
 
@@ -270,7 +270,7 @@ mod systems_hot {
         );
 
         //Assets
-        let _ = copy_dir_all(bm.meta.asset_path, bevy_folder.to_owned() + "/assets");
+        let _ = copy_dir_all(bm.meta.asset_path, bevy_folder + "/assets");
     }
 
     if bm.meta.bevy_type.eq(&BevyType::App)
@@ -334,7 +334,7 @@ impl BevyCodegen for Scope {
         for (name, ty) in &system.param {
             fun = fun.arg(name, ty);
         }
-        if &system.visibility.len() > &0 {
+        if system.visibility.is_empty() {
             fun.vis(&system.visibility);
         }
         for att in &system.attributes {

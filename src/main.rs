@@ -4,17 +4,12 @@ pub mod templates;
 use std::{fs, path::Path};
 
 use bevy::{
-    diagnostic::FrameTimeDiagnosticsPlugin,
-    prelude::{App, KeyCode},
-    winit::WinitSettings,
-    DefaultPlugins,
+    diagnostic::FrameTimeDiagnosticsPlugin, prelude::App, winit::WinitSettings, DefaultPlugins,
 };
 use bevy_codegen::{
-    generate::GenerationType,
-    model::{BevyModel, Component, Plugin},
-    templates::default_cargo_src_template,
+    generate::GenerationType, model::Component, templates::default_cargo_src_template,
 };
-use bevy_editor_pls::{controls, prelude::*};
+use bevy_editor_pls::prelude::*;
 use codegen::Scope;
 use history::{PotooEvents, ProjectModel};
 use rust_format::{Formatter, RustFmt};
@@ -22,13 +17,15 @@ use templates::default_game_template;
 use undo::History;
 
 fn main() {
-    /*App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugin(EditorPlugin)
-        .insert_resource(WinitSettings::desktop_app())
-        .add_plugin(FrameTimeDiagnosticsPlugin)
-        .run();
-    */
+    let run_app = false;
+    if run_app {
+        App::new()
+            .add_plugins(DefaultPlugins)
+            .add_plugin(EditorPlugin)
+            .insert_resource(WinitSettings::desktop_app())
+            .add_plugin(FrameTimeDiagnosticsPlugin)
+            .run();
+    }
 
     let bm = default_game_template();
     let mut pm = ProjectModel {
@@ -46,28 +43,24 @@ fn main() {
         ..Default::default()
     })));
 
-    /*
-    println!("Raw:\n");
-    println!("{:?}\n", pm.model);
+    let display_info = false;
 
-    println!("Simplified Pretty:\n");
-    println!("{}\n", pm.model);
+    if display_info {
+        println!("Raw:\n");
+        println!("{:?}\n", pm.model);
 
-    println!("Codegen format:\n");
-    let cg = pm
-    .model
-    .generate_code(Scope::new(), GenerationType::All);
-    println!("{:?}\n", cg);
-    */
+        println!("Simplified Pretty:\n");
+        println!("{}\n", pm.model);
+    }
 
     //Write to file
     let bevy_folder = pm.model.meta.name.clone();
     let already_exists = Path::new(&bevy_folder).exists();
     if already_exists {
-        remove_path(bevy_folder.to_string() + "/" + &"Cargo.toml".to_string());
-        remove_path(bevy_folder.to_string() + "/" + &"src".to_string());
-        remove_path(bevy_folder.to_string() + "/" + &"components".to_string());
-        remove_path(bevy_folder.to_string() + "/" + &"systems".to_string());
+        remove_path(bevy_folder.to_string() + "/" + "Cargo.toml");
+        remove_path(bevy_folder.to_string() + "/" + "src");
+        remove_path(bevy_folder.to_string() + "/" + "components");
+        remove_path(bevy_folder + "/" + "systems");
     }
 
     //Remove whole project
@@ -77,19 +70,23 @@ fn main() {
     let _ = pm.model.generate(GenerationType::Components);
     let _ = pm.model.generate(GenerationType::Systems);
 
-    /*
-    println!("Codegen result:\n");
-    let res = cg.to_string();
-    println!("{:?}\n", res);
+    if display_info {
+        println!("Codegen format:\n");
+        let cg = pm.model.generate_code(Scope::new(), GenerationType::All);
+        println!("{:?}\n", cg);
 
-    println!("Prettified Codegen result:\n");
-    let pretty_res = RustFmt::default().format_str(res).unwrap();
-    println!("{:?}\n", pretty_res);
+        println!("Codegen result:\n");
+        let res = cg.to_string();
+        println!("{:?}\n", res);
 
-    println!("Cargo Toml:\n");
-    let toml = default_cargo_src_template(&pm.model);
-    println!("{:?}\n", toml);
-    */
+        println!("Prettified Codegen result:\n");
+        let pretty_res = RustFmt::default().format_str(res).unwrap();
+        println!("{:?}\n", pretty_res);
+
+        println!("Cargo Toml:\n");
+        let toml = default_cargo_src_template(&pm.model);
+        println!("{:?}\n", toml);
+    }
 }
 
 fn remove_path(path: String) {
@@ -97,9 +94,9 @@ fn remove_path(path: String) {
     let is_dir = Path::new(&path).is_dir();
     if already_exists {
         if is_dir {
-            let _ = fs::remove_dir_all(path.to_owned());
+            let _ = fs::remove_dir_all(&path);
         } else {
-            let _ = fs::remove_file(path.to_owned());
+            let _ = fs::remove_file(&path);
         }
     }
 }

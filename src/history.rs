@@ -1,4 +1,3 @@
-use bevy::ecs::component;
 use bevy_codegen::model::{BevyModel, Component};
 use undo::{Action, History};
 
