@@ -1,7 +1,11 @@
 pub mod history;
 pub mod templates;
 
-use std::{fs, path::Path};
+use std::{
+    fs::{self, File},
+    io::Write,
+    path::Path,
+};
 
 use bevy::{
     diagnostic::FrameTimeDiagnosticsPlugin, prelude::App, winit::WinitSettings, DefaultPlugins,
@@ -43,7 +47,7 @@ fn main() {
         ..Default::default()
     })));
 
-    let display_info = false;
+    let display_info = true;
 
     if display_info {
         println!("Raw:\n");
@@ -60,7 +64,7 @@ fn main() {
         remove_path(bevy_folder.to_string() + "/" + "Cargo.toml");
         remove_path(bevy_folder.to_string() + "/" + "src");
         remove_path(bevy_folder.to_string() + "/" + "components");
-        remove_path(bevy_folder + "/" + "systems");
+        remove_path(bevy_folder.to_string() + "/" + "systems");
     }
 
     //Remove whole project
@@ -86,6 +90,11 @@ fn main() {
         println!("Cargo Toml:\n");
         let toml = default_cargo_src_template(&pm.model);
         println!("{toml:?}\n");
+
+        let _ = fs::create_dir_all(bevy_folder.to_string());
+        let po2_filename = format!("/{}.po2.json", bevy_folder.to_string());
+        let mut cargo_file = File::create(bevy_folder.to_string() + &po2_filename).unwrap();
+        let _ = cargo_file.write_all(serde_json::to_string(&pm.model).unwrap().as_bytes());
     }
 }
 
