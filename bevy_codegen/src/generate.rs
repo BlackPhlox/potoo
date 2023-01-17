@@ -40,7 +40,7 @@ impl BevyModel {
                 let mut startup_system_app_code: String = "".into();
                 for system in &self.startup_systems {
                     startup_system_app_code
-                        .push_str(format!(".add_startup_system({})", &system.name).as_str());
+                        .push_str(format!(".add_startup_system(systems::{})", &system.name).as_str());
                 }
 
                 let mut system_app_code: String = "".into();
