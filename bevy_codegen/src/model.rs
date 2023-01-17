@@ -36,7 +36,7 @@ impl Default for Meta {
             name: "bevy_default_meta".to_string(),
             bevy_type: BevyType::App,
             asset_path: "assets".to_string(),
-            po2_version: Default::default()
+            po2_version: Default::default(),
         }
     }
 }
@@ -50,10 +50,10 @@ pub enum Po2Version {
 
 impl Display for Po2Version {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut v = format!("{:?}", self);
+        let mut v = format!("{self:?}");
         v.remove(0);
-        v = v.replace("_", ".");
-        let _ = write!(f, "{}", v);
+        v = v.replace('_', ".");
+        let _ = write!(f, "{v}");
         Ok(())
     }
 }
@@ -141,17 +141,12 @@ pub struct CrateDependency {
     pub crate_paths: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub enum Used {
+    #[default]
     Main,
     Components,
     Systems,
-}
-
-impl Default for Used {
-    fn default() -> Self {
-        Used::Main
-    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
@@ -280,7 +275,7 @@ impl Display for BevyModel {
 
         let _ = writeln!(f, "   Plugins:");
         self.plugins.iter().for_each(|d| {
-            let _ = writeln!(f, "       {:?},", d);
+            let _ = writeln!(f, "       {d:?},");
         });
 
         Ok(())

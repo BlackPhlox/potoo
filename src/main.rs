@@ -73,19 +73,19 @@ fn main() {
     if display_info {
         println!("Codegen format:\n");
         let cg = pm.model.generate_code(Scope::new(), GenerationType::All);
-        println!("{:?}\n", cg);
+        println!("{cg:?}\n");
 
         println!("Codegen result:\n");
         let res = cg.to_string();
-        println!("{:?}\n", res);
+        println!("{res:?}\n");
 
         println!("Prettified Codegen result:\n");
         let pretty_res = RustFmt::default().format_str(res).unwrap();
-        println!("{:?}\n", pretty_res);
+        println!("{pretty_res:?}\n");
 
         println!("Cargo Toml:\n");
         let toml = default_cargo_src_template(&pm.model);
-        println!("{:?}\n", toml);
+        println!("{toml:?}\n");
     }
 }
 

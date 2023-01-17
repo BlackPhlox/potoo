@@ -98,7 +98,7 @@ pub fn default_cargo_src_template(model: &BevyModel) -> String {
 
     let buf = format!(
         r#"[package]
-name = "{meta_name}"
+name = "{bevy_folder}"
 version = "0.1.0"
 edition = "2021"
 
@@ -142,10 +142,7 @@ version = "0.9"
 [dev-dependencies.bevy]
 version = "0.9"
 {dev_features}
-"#,
-        meta_name = bevy_folder,
-        features = features,
-        dev_features = dev_features,
+"#
     );
     buf
 }

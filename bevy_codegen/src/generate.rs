@@ -39,8 +39,9 @@ impl BevyModel {
 
                 let mut startup_system_app_code: String = "".into();
                 for system in &self.startup_systems {
-                    startup_system_app_code
-                        .push_str(format!(".add_startup_system(systems::{})", &system.name).as_str());
+                    startup_system_app_code.push_str(
+                        format!(".add_startup_system(systems::{})", &system.name).as_str(),
+                    );
                 }
 
                 let mut system_app_code: String = "".into();
@@ -115,7 +116,7 @@ impl BevyModel {
             //println!("Test: {:?}", r);
             bevy_lib_file.write_all(r.as_bytes())?;
         } else {
-            println!("Generate.rs 119: {:?}", res);
+            println!("Generate.rs 119: {res:?}");
         }
 
         Ok(())
@@ -216,33 +217,24 @@ fn generate_structure(bm: BevyModel, gen_type: GenerationType) -> std::io::Resul
         match cc {
             Custom::Main(x) if gen_type.eq(&GenerationType::Main) => {
                 let path = bevy_folder.to_owned() + "/src";
-                println!("path: {}", path);
                 let full_path = path.to_string() + &x.name;
                 fs::create_dir_all(path)?;
-                println!("full_path: {}", full_path);
                 let mut cc_file = File::create(full_path)?;
-                let r = cc_file.write((x.content).as_bytes());
-                println!("Result: {:?}", r);
+                let _ = cc_file.write((x.content).as_bytes());
             }
             Custom::Component(x) if gen_type.eq(&GenerationType::Components) => {
                 let path = bevy_folder.to_owned() + "/components/src";
-                println!("path: {}", path);
                 let full_path = path.to_string() + "/" + &x.name;
                 fs::create_dir_all(path)?;
-                println!("full_path: {}", full_path);
                 let mut cc_file = File::create(full_path)?;
-                let r = cc_file.write((x.content).as_bytes());
-                println!("Result: {:?}", r);
+                let _ = cc_file.write((x.content).as_bytes());
             }
             Custom::System(x) if gen_type.eq(&GenerationType::Systems) => {
                 let path = bevy_folder.to_owned() + "/systems/src";
-                println!("path: {}", path);
                 let full_path = path.to_string() + "/" + &x.name;
                 fs::create_dir_all(path)?;
-                println!("full_path: {}", full_path);
                 let mut cc_file = File::create(full_path)?;
-                let r = cc_file.write((x.content).as_bytes());
-                println!("Result: {:?}", r);
+                let _ = cc_file.write((x.content).as_bytes());
             }
             _ => (),
         }
@@ -309,7 +301,7 @@ trait BevyCodegen {
 impl BevyCodegen for Scope {
     fn create_app(&mut self, inner_content: &str) -> &mut Function {
         self.new_fn("main")
-            .line(format!("App::new(){}.run();", inner_content))
+            .line(format!("App::new(){inner_content}.run();"))
     }
 
     fn create_plugin(&mut self, plugin: Plugin, content: &str) -> &mut Function {
@@ -453,7 +445,7 @@ pub fn test2(field: Type) {}
         assert_eq!(
             scp.generate(),
 r#"#[derive(Component)]
-struct TestPlugin;
+pub struct TestPlugin;
 "#
         );
     }
