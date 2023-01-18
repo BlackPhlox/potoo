@@ -91,9 +91,9 @@ fn main() {
         let toml = default_cargo_src_template(&pm.model);
         println!("{toml:?}\n");
 
-        let _ = fs::create_dir_all(bevy_folder.to_string());
-        let po2_filename = format!("/{}.po2.json", bevy_folder.to_string());
-        let mut cargo_file = File::create(bevy_folder.to_string() + &po2_filename).unwrap();
+        let _ = fs::create_dir_all(&bevy_folder);
+        let po2_filename = format!("/{bevy_folder}.po2.json");
+        let mut cargo_file = File::create(bevy_folder + &po2_filename).unwrap();
         let _ = cargo_file.write_all(serde_json::to_string(&pm.model).unwrap().as_bytes());
     }
 }
