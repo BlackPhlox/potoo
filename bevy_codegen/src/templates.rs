@@ -32,13 +32,6 @@ bevy = "0.9"
 [features]
 default = []
 dynamic = ["bevy/dynamic"]
-
-[profile.dev]
-opt-level = 1
-
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
-[profile.dev.package."*"]
-opt-level = 3
 "#
     .to_string()
 }
@@ -61,13 +54,6 @@ rand = "0.8.5"
 [features]
 default = []
 dynamic = ["bevy/dynamic", "components/dynamic"]
-
-[profile.dev]
-opt-level = 1
-
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
-[profile.dev.package."*"]
-opt-level = 3
 "#
     .to_string()
 }
