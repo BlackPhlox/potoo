@@ -42,7 +42,7 @@ $ cargo run --features reload
 
 ## Windows
 ```
-$ cargo watch -w systems -w components -x "build -p systems --features dynamic"
+$ cargo watch -w systems -x "build -p systems --features dynamic" --ignore-nothing
 $ cargo run --features reload --target-dir "target-bin"
 ```
 
