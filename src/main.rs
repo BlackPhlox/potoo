@@ -8,15 +8,17 @@ use std::{
     process::Command,
 };
 
+/*
 use bevy::{
     diagnostic::FrameTimeDiagnosticsPlugin, prelude::App, winit::WinitSettings, DefaultPlugins,
 };
+*/
 use bevy_codegen::{
     generate::GenerationType,
     model::{BevyModel, Component, ConfirmPo2Version, Po2Version, ReadPo2Version},
     templates::default_cargo_src_template,
 };
-use bevy_editor_pls::prelude::*;
+//use bevy_editor_pls::prelude::*;
 use codegen::Scope;
 use history::{PotooEvents, ProjectModel};
 use rust_format::{Formatter, RustFmt};
@@ -24,6 +26,7 @@ use templates::default_game_template;
 use undo::History;
 
 fn main() {
+    /*
     let run_app = false;
     if run_app {
         App::new()
@@ -33,7 +36,7 @@ fn main() {
             .add_plugin(FrameTimeDiagnosticsPlugin)
             .run();
     }
-
+    */
     let bm = default_game_template();
     let mut pm = ProjectModel {
         model: bm,
