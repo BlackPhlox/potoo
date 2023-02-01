@@ -5,13 +5,16 @@ use std::{
     fs::{self, File},
     io::Write,
     path::Path,
+    process::Command,
 };
 
 use bevy::{
     diagnostic::FrameTimeDiagnosticsPlugin, prelude::App, winit::WinitSettings, DefaultPlugins,
 };
 use bevy_codegen::{
-    generate::GenerationType, model::Component, templates::default_cargo_src_template,
+    generate::GenerationType,
+    model::{BevyModel, Component, ConfirmPo2Version, Po2Version, ReadPo2Version},
+    templates::default_cargo_src_template,
 };
 use bevy_editor_pls::prelude::*;
 use codegen::Scope;
@@ -93,9 +96,75 @@ fn main() {
 
         let _ = fs::create_dir_all(&bevy_folder);
         let po2_filename = format!("/{bevy_folder}.po2.json");
-        let mut cargo_file = File::create(bevy_folder + &po2_filename).unwrap();
-        let _ = cargo_file.write_all(serde_json::to_string(&pm.model).unwrap().as_bytes());
+        let mut cargo_file = File::create(bevy_folder.clone() + &po2_filename).unwrap();
+        let ser_prep = ReadPo2Version {
+            po2_version: Po2Version::default(),
+            model: pm.model,
+        };
+        let _ = cargo_file.write_all(serde_json::to_string(&ser_prep).unwrap().as_bytes());
+
+        let a = read_po2_file(format!("{bevy_folder}{po2_filename}"));
+        println!("Res {a:?}");
+
+        /*
+        cargo watch -w systems -x "build -p systems --features dynamic" --ignore-nothing
+        cargo run --features reload --target-dir "target-bin"
+        */
+        
+        
+        let _b1 = Command::new("cargo")
+            .arg("build")
+            .args(["-p", "systems"])
+            .args(["--features", " dynamic"])
+            .current_dir(bevy_folder.clone())
+            .status();
+
+        let _b2 = Command::new("cargo")
+            .arg("build")
+            .args(["--features", "reload"])
+            .args(["--target-dir", "target-bin"])
+            .current_dir(bevy_folder.clone())
+            .status();
+
+        let _run_watch = Command::new("cargo")
+            .arg("watch")
+            .args(["-w", "systems"])
+            .args(["-w", "components"])
+            .args(["-x", "build -p systems --features dynamic"])
+            .arg("--ignore-nothing")
+            .current_dir(bevy_folder.clone())
+            .spawn();
+
+        let _run_reload = Command::new("cargo")
+            .arg("run")
+            .args(["--features", "reload"])
+            .args(["--target-dir", "target-bin"])
+            .current_dir(bevy_folder.clone())
+            .status();
+            
+        
     }
+}
+
+#[must_use]
+fn read_po2_file(path: String) -> BevyModel {
+    let file_as_string = fs::read_to_string(path).unwrap();
+    let parsed_version_file = serde_json::from_str::<ReadPo2Version>(&file_as_string).unwrap();
+    let compatible = match parsed_version_file.po2_version {
+        Po2Version::V0_0_1 => true,
+        parsed_po2_version => {
+            println!(
+                "Warning: File is not compatible ({parsed_po2_version}) with current version {}",
+                Po2Version::default()
+            );
+            false
+        }
+    };
+    if !compatible {
+        //TODO: Do something
+    }
+    let parsed_file = serde_json::from_str::<ConfirmPo2Version>(&file_as_string).unwrap();
+    parsed_file.model
 }
 
 fn remove_path(path: String) {

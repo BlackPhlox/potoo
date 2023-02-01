@@ -3,16 +3,29 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
+pub struct ReadPo2Version {
+    pub po2_version: Po2Version,
+    #[serde(skip_deserializing)]
+    pub model: BevyModel,
+}
+
+#[derive(Serialize, Deserialize, Clone, Default, Debug)]
+pub struct ConfirmPo2Version {
+    pub po2_version: Po2Version,
+    pub model: BevyModel,
+}
+
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug)]
 pub struct BevyModel {
+    pub meta: Meta,
+    pub bevy_settings: Settings,
     pub plugins: Vec<Plugin>,
     pub components: Vec<Component>,
     pub startup_systems: Vec<System>,
     pub systems: Vec<System>,
-    pub bevy_settings: Settings,
-    pub meta: Meta,
-    pub examples: Vec<BevyModel>,
     pub custom: Vec<Custom>,
     pub imports: Vec<Import>,
+    pub examples: Vec<BevyModel>,
 }
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
@@ -22,7 +35,7 @@ pub enum BevyType {
     PluginGroup(String),
     Example,
 }
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub struct Meta {
     pub name: String,
     pub bevy_type: BevyType,
@@ -41,9 +54,10 @@ impl Default for Meta {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug, Default)]
 #[non_exhaustive]
 pub enum Po2Version {
+    // Default points to the latest format version
     #[default]
     V0_0_1 = 0,
 }
@@ -63,12 +77,31 @@ mod tests {
     use super::*;
 
     #[test]
+    fn ser_and_deserialize() {
+        let def_bm = BevyModel {
+            meta: Meta {
+                //name: "HelloWorld".to_string(),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        let wrap = ReadPo2Version {
+            po2_version: Po2Version::V0_0_1,
+            model: def_bm.clone(),
+        };
+        let json = serde_json::to_string(&wrap).unwrap();
+        let obj = serde_json::from_str::<ReadPo2Version>(json.as_str()).unwrap();
+        assert_eq!(def_bm, obj.model);
+    }
+
+    #[test]
     fn converts_to_the_correct_version() {
         assert_eq!("0.0.1", Po2Version::V0_0_1.to_string())
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub struct System {
     pub name: String,
     pub param: Vec<(String, String)>,
@@ -89,7 +122,7 @@ impl Default for System {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub struct Component {
     pub name: String,
     pub content: Vec<(String, String)>,
@@ -104,21 +137,21 @@ impl Default for Component {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub struct Plugin {
     pub name: String,
     pub is_group: bool,
     pub dependencies: Vec<CrateDependency>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub enum Custom {
     Main(CustomCode),
     Component(CustomCode),
     System(CustomCode),
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub struct CustomCode {
     pub name: String,
     pub content: String,
@@ -134,14 +167,14 @@ impl Default for Plugin {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Default, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug)]
 pub struct CrateDependency {
     pub crate_name: String,
     pub crate_version: String,
     pub crate_paths: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug, Default)]
 pub enum Used {
     #[default]
     Main,
@@ -149,19 +182,19 @@ pub enum Used {
     Systems,
 }
 
-#[derive(Serialize, Deserialize, Clone, Default, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug)]
 pub struct Import {
     pub used: Used,
     pub dependency: CrateDependency,
 }
 
-#[derive(Serialize, Deserialize, Clone, Default, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug)]
 pub struct Settings {
     pub features: Vec<Feature>,
     pub dev_features: Vec<Feature>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub enum Feature {
     Default,
     BevyAudio,
