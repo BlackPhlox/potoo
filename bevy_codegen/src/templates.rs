@@ -118,7 +118,7 @@ reload = [
 [dependencies]
 components = {{ path = "components" }}
 systems = {{ path = "systems" }}
-hot-lib-reloader = {{ version = "0.6.4", optional = true }}
+hot-lib-reloader = {{ version = "0.6.5", optional = true }}
 {crate_deps}
 
 [dependencies.bevy]

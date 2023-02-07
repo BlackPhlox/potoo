@@ -24,7 +24,7 @@ pub fn default_game_template() -> BevyModel {
 
     //For asset_server
     bevy_model.plugins.push(Plugin {
-        name: "DefaultPlugins".to_string(),
+        name: "DefaultPlugins.set(AssetPlugin{watch_for_changes: true, ..default()})".to_string(),
         is_group: true,
         dependencies: vec![],
     });
