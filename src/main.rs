@@ -113,8 +113,7 @@ fn main() {
         cargo watch -w systems -x "build -p systems --features dynamic" --ignore-nothing
         cargo run --features reload --target-dir "target-bin"
         */
-        
-        
+
         let _b1 = Command::new("cargo")
             .arg("build")
             .args(["-p", "systems"])
@@ -142,10 +141,8 @@ fn main() {
             .arg("run")
             .args(["--features", "reload"])
             .args(["--target-dir", "target-bin"])
-            .current_dir(bevy_folder.clone())
+            .current_dir(bevy_folder)
             .status();
-            
-        
     }
 }
 
