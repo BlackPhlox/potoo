@@ -4,15 +4,16 @@ use undo::{Action, History};
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum PotooEvent {
-    Component(Component),
+    AddComponent(Component),
+    RemoveComponent(Component),
 }
 
 #[derive(Clone, Debug)]
 pub struct PotooEvents(pub PotooEvent);
 
 impl ProjectModel {
-    pub fn apply(&mut self, add: PotooEvents) {
-        self.history.apply(&mut self.model, add);
+    pub fn apply(&mut self, event: PotooEvents) {
+        self.history.apply(&mut self.model, event);
     }
 
     pub fn redo(&mut self) {
@@ -30,16 +31,25 @@ impl Action for PotooEvents {
 
     fn apply(&mut self, target: &mut Self::Target) -> Self::Output {
         match &self.0 {
-            PotooEvent::Component(component) => {
-                target.components.push(component.clone());
+            PotooEvent::AddComponent(c) => target.components.push(c.clone()),
+            PotooEvent::RemoveComponent(_) => {
+                target.components.pop();
             }
         };
     }
 
     fn undo(&mut self, target: &mut Self::Target) -> Self::Output {
-        match self.0 {
-            PotooEvent::Component(_) => target.components.pop(),
+        match &self.0 {
+            PotooEvent::AddComponent(_) => target.components.pop(),
+            PotooEvent::RemoveComponent(c) => {
+                target.components.push(c.clone());
+                Some(c.clone())
+            }
         };
+    }
+
+    fn redo(&mut self, target: &mut Self::Target) -> Self::Output {
+        self.apply(target)
     }
 }
 

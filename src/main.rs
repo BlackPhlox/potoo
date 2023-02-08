@@ -20,6 +20,7 @@ use bevy_codegen::{
 };
 //use bevy_editor_pls::prelude::*;
 use codegen::Scope;
+use history::PotooEvent::*;
 use history::{PotooEvents, ProjectModel};
 use rust_format::{Formatter, RustFmt};
 use templates::default_game_template;
@@ -43,12 +44,12 @@ fn main() {
         history: History::new(),
     };
 
-    pm.apply(PotooEvents(history::PotooEvent::Component(Component {
+    pm.apply(PotooEvents(AddComponent(Component {
         name: "OtherShip".to_string(),
         ..Default::default()
     })));
 
-    pm.apply(PotooEvents(history::PotooEvent::Component(Component {
+    pm.apply(PotooEvents(AddComponent(Component {
         name: "Bullet".to_string(),
         ..Default::default()
     })));
