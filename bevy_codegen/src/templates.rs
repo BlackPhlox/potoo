@@ -1,5 +1,7 @@
 use crate::model::{BevyModel, Feature};
 
+const BEVY_VERSION: &str = "0.9";
+
 pub fn feature_write(features: &Vec<Feature>) -> String {
     let mut features_str = "".to_owned();
     if features.is_empty() {
@@ -19,7 +21,8 @@ pub fn feature_write(features: &Vec<Feature>) -> String {
 }
 
 pub fn default_cargo_components_template() -> String {
-    r#"[package]
+    format!(
+        r#"[package]
 name = "components"
 version = "0.1.0"
 edition = "2021"
@@ -27,17 +30,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.9"
+bevy = "{BEVY_VERSION}"
 
 [features]
 default = []
 dynamic = ["bevy/dynamic"]
 "#
-    .to_string()
+    )
 }
 
 pub fn default_cargo_systems_template() -> String {
-    r#"[package]
+    format!(
+        r#"[package]
 name = "systems"
 version = "0.1.0"
 edition = "2021"
@@ -46,8 +50,8 @@ edition = "2021"
 crate-type = ["rlib", "dylib"]
 
 [dependencies]
-bevy = "0.9"
-components = { path = "../components" }
+bevy = "{BEVY_VERSION}"
+components = {{ path = "../components" }}
 log = "0.4.17"
 rand = "0.8.5"
 
@@ -55,7 +59,7 @@ rand = "0.8.5"
 default = []
 dynamic = ["bevy/dynamic", "components/dynamic"]
 "#
-    .to_string()
+    )
 }
 
 pub fn default_cargo_src_template(model: &BevyModel) -> String {
@@ -122,11 +126,11 @@ hot-lib-reloader = {{ version = "0.6.5", optional = true }}
 {crate_deps}
 
 [dependencies.bevy]
-version = "0.9"
+version = "{BEVY_VERSION}"
 {features}
 
 [dev-dependencies.bevy]
-version = "0.9"
+version = "{BEVY_VERSION}"
 {dev_features}
 "#
     );
