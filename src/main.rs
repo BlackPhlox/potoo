@@ -54,6 +54,9 @@ fn main() {
         ..Default::default()
     })));
 
+    println!("History:");
+    println!("{:?}", pm.history);
+
     let display_info = true;
 
     if display_info {
