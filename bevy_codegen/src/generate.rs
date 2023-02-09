@@ -456,10 +456,24 @@ pub fn test2(field: Type) {}
     #[rustfmt::skip]
     fn create_component_works() {
         let mut scp = Scope::new();
-        scp.create_component(Component { name: "TestPlugin".to_string(), content: vec![] });
+        scp.create_component(Component { name: "TestPlugin".to_string(), content: vec![], is_reflected: false, ..Default::default() });
         assert_eq!(
             scp.generate(),
 r#"#[derive(Component)]
+pub struct TestPlugin;
+"#
+        );
+    }
+
+    #[test]
+    #[rustfmt::skip]
+    fn create_default_component_works() {
+        let mut scp = Scope::new();
+        scp.create_component(Component { name: "TestPlugin".to_string(), ..Default::default() });
+        assert_eq!(
+            scp.generate(),
+r#"#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct TestPlugin;
 "#
         );
