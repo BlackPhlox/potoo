@@ -15,7 +15,7 @@ use bevy::{
 */
 use bevy_codegen::{
     generate::GenerationType,
-    model::{BevyModel, Component, ConfirmPo2Version, Po2Version, ReadPo2Version, System},
+    model::{BevyModel, Component, ConfirmPo2Version, Po2Version, ReadPo2Version},
     templates::default_cargo_src_template,
 };
 //use bevy_editor_pls::prelude::*;
@@ -63,7 +63,7 @@ fn main() {
         attributes: vec!["no_mangle".to_string()],
     })));
     */
-    
+
     println!("History:");
     println!("{:?}", pm.history);
 

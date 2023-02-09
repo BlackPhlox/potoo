@@ -126,6 +126,9 @@ impl Default for System {
 pub struct Component {
     pub name: String,
     pub content: Vec<(String, String)>,
+    pub is_reflected: bool,
+    pub attributes: Vec<String>,
+    pub derives: Vec<String>,
 }
 
 impl Default for Component {
@@ -133,6 +136,9 @@ impl Default for Component {
         Self {
             name: "TestComponent".to_string(),
             content: Default::default(),
+            attributes: Default::default(),
+            derives: Default::default(),
+            is_reflected: true,
         }
     }
 }

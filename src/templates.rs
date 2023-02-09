@@ -20,6 +20,7 @@ pub fn default_game_template() -> BevyModel {
             ("rotation_speed".to_string(), "f32".to_string()),
             ("shooting_timer".to_string(), "Option<f32>".to_string()),
         ],
+        ..Default::default()
     });
 
     //For asset_server

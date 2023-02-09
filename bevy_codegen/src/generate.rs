@@ -79,6 +79,9 @@ impl BevyModel {
                     scope.create_component(Component {
                         name: component.name.clone(),
                         content: component.content.clone(),
+                        attributes: component.attributes.clone(),
+                        derives: component.derives.clone(),
+                        is_reflected: component.is_reflected,
                     });
                 }
             }
@@ -341,7 +344,19 @@ impl BevyCodegen for Scope {
             f.vis("pub");
             a.push_field(f);
         }
-        a.derive("Component")
+        for attribute in component.attributes.iter() {
+            a.attr(attribute);
+        }
+        a.derive("Component");
+        for derive in component.derives.iter() {
+            a.derive(derive);
+        }
+        if component.is_reflected {
+            a.derive("Reflect");
+            a.derive("Default");
+            a.attr("reflect(Component)");
+        }
+        a
     }
 
     fn generate(&mut self) -> String {
