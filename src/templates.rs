@@ -30,6 +30,14 @@ pub fn default_game_template() -> BevyModel {
         dependencies: vec![],
     });
 
+    /*
+    let cd = CrateDependency{ crate_name: "bevy_editor_pls".to_string(), crate_version: "0.2".to_string(), crate_paths: vec!["prelude::*".to_string()] };
+    bevy_model.imports.push(Import { used: Used::Main, dependency: cd.clone() });    
+    bevy_model.plugins.push(
+        Plugin { name: "EditorPlugin".to_string(), is_group: false, dependencies: vec![cd] }
+    );
+    */
+
     let setup_entities = System {
         name: "setup".to_string(),
         param: vec![

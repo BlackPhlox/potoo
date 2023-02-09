@@ -128,6 +128,8 @@ fn main() {
         cargo run --features reload --target-dir "target-bin"
         */
 
+        //Start http server
+
         let _b1 = Command::new("cargo")
             .arg("build")
             .args(["-p", "systems"])
