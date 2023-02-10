@@ -30,20 +30,25 @@ pub fn default_game_template() -> BevyModel {
         dependencies: vec![],
     });
 
-    let cd = CargoDependency {
-        name: "bevy_editor_pls".to_string(),
-        dependency_type: DependencyType::Crate("0.2".to_string()),
-        paths: vec!["prelude::*".to_string()],
-    };
-    bevy_model.imports.push(Import {
-        used: Used::Main,
-        dependency: cd.clone(),
-    });
-    bevy_model.plugins.push(Plugin {
-        name: "EditorPlugin".to_string(),
-        is_group: false,
-        dependencies: vec![cd],
-    });
+    let use_editor_pls = false;
+
+    if use_editor_pls {
+        let cd = CargoDependency {
+            name: "bevy_editor_pls".to_string(),
+            dependency_type: DependencyType::Git("https://github.com/jakobhellermann/bevy_editor_pls".to_string(), "main".to_string()),
+            paths: vec!["prelude::*".to_string()],
+        };
+        bevy_model.imports.push(Import {
+            used: Used::Main,
+            dependency: cd.clone(),
+        });
+        bevy_model.plugins.push(Plugin {
+            name: "EditorPlugin".to_string(),
+            is_group: false,
+            dependencies: vec![cd],
+        });
+    }
+
 
     let setup_entities = System {
         name: "setup".to_string(),
@@ -53,7 +58,7 @@ pub fn default_game_template() -> BevyModel {
         ],
         content: r#"
 
-//commands.spawn(Camera2dBundle::default());
+commands.spawn(Camera2dBundle::default());
 
 // player
 let ship_handle = asset_server.load("ship_C.png");
