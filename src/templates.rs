@@ -1,6 +1,6 @@
 use bevy_codegen::model::{
-    BevyModel, BevyType, Component, CrateDependency, Custom, CustomCode, Feature, Import, Meta,
-    Plugin, System, Used,
+    BevyModel, BevyType, CargoDependency, Component, Custom, CustomCode, DependencyType, Feature,
+    Import, Meta, Plugin, System, Used,
 };
 
 pub fn default_game_template() -> BevyModel {
@@ -30,13 +30,20 @@ pub fn default_game_template() -> BevyModel {
         dependencies: vec![],
     });
 
-    /*
-    let cd = CrateDependency{ crate_name: "bevy_editor_pls".to_string(), crate_version: "0.2".to_string(), crate_paths: vec!["prelude::*".to_string()] };
-    bevy_model.imports.push(Import { used: Used::Main, dependency: cd.clone() });    
-    bevy_model.plugins.push(
-        Plugin { name: "EditorPlugin".to_string(), is_group: false, dependencies: vec![cd] }
-    );
-    */
+    let cd = CargoDependency {
+        name: "bevy_editor_pls".to_string(),
+        dependency_type: DependencyType::Crate("0.2".to_string()),
+        paths: vec!["prelude::*".to_string()],
+    };
+    bevy_model.imports.push(Import {
+        used: Used::Main,
+        dependency: cd.clone(),
+    });
+    bevy_model.plugins.push(Plugin {
+        name: "EditorPlugin".to_string(),
+        is_group: false,
+        dependencies: vec![cd],
+    });
 
     let setup_entities = System {
         name: "setup".to_string(),
@@ -46,7 +53,7 @@ pub fn default_game_template() -> BevyModel {
         ],
         content: r#"
 
-commands.spawn(Camera2dBundle::default());
+//commands.spawn(Camera2dBundle::default());
 
 // player
 let ship_handle = asset_server.load("ship_C.png");
@@ -317,28 +324,28 @@ pub(crate) fn is_outside_bounds(point: Vec2, bounds: (f32, f32, f32, f32)) -> bo
 
     bevy_model.imports.push(Import {
         used: Used::Systems,
-        dependency: CrateDependency {
-            crate_name: "rand".to_string(),
-            crate_version: "0.8".to_string(),
-            crate_paths: vec!["thread_rng".to_string(), "Rng".to_string()],
+        dependency: CargoDependency {
+            name: "rand".to_string(),
+            dependency_type: DependencyType::Crate("0.8".to_string()),
+            paths: vec!["thread_rng".to_string(), "Rng".to_string()],
         },
     });
 
     bevy_model.imports.push(Import {
         used: Used::Systems,
-        dependency: CrateDependency {
-            crate_name: "bevy".to_string(),
-            crate_version: "0.9".to_string(),
-            crate_paths: vec!["sprite::collide_aabb".to_string()],
+        dependency: CargoDependency {
+            name: "bevy".to_string(),
+            dependency_type: DependencyType::Crate("0.9".to_string()),
+            paths: vec!["sprite::collide_aabb".to_string()],
         },
     });
 
     bevy_model.imports.push(Import {
         used: Used::Systems,
-        dependency: CrateDependency {
-            crate_name: "crate".to_string(),
-            crate_version: "0.0".to_string(),
-            crate_paths: vec!["utilities::BOUNDS".to_string()],
+        dependency: CargoDependency {
+            name: "crate".to_string(),
+            dependency_type: DependencyType::Crate("0.0".to_string()),
+            paths: vec!["utilities::BOUNDS".to_string()],
         },
     });
 

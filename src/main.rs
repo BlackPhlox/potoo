@@ -68,6 +68,7 @@ fn main() {
     println!("{:?}", pm.history);
 
     let display_info = true;
+    let build_and_run = false;
 
     if display_info {
         println!("Raw:\n");
@@ -122,7 +123,9 @@ fn main() {
 
         let a = read_po2_file(format!("{bevy_folder}{po2_filename}"));
         println!("Res {a:?}");
+    }
 
+    if build_and_run {
         /*
         cargo watch -w systems -x "build -p systems --features dynamic" --ignore-nothing
         cargo run --features reload --target-dir "target-bin"

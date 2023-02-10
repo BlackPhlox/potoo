@@ -147,7 +147,7 @@ impl Default for Component {
 pub struct Plugin {
     pub name: String,
     pub is_group: bool,
-    pub dependencies: Vec<CrateDependency>,
+    pub dependencies: Vec<CargoDependency>,
 }
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
@@ -174,10 +174,30 @@ impl Default for Plugin {
 }
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug)]
-pub struct CrateDependency {
-    pub crate_name: String,
-    pub crate_version: String,
-    pub crate_paths: Vec<String>,
+pub struct CargoDependency {
+    pub name: String,
+    pub dependency_type: DependencyType,
+    pub paths: Vec<String>,
+}
+
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
+pub enum DependencyType {
+    Crate(String),
+    Git(String, String),
+    Path(String),
+}
+
+impl Default for DependencyType {
+    fn default() -> Self {
+        DependencyType::Crate("*".to_string())
+    }
+}
+
+impl Display for DependencyType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let _ = write!(f, "{:?}", self);
+        Ok(())
+    }
 }
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug, Default)]
@@ -191,7 +211,7 @@ pub enum Used {
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug)]
 pub struct Import {
     pub used: Used,
-    pub dependency: CrateDependency,
+    pub dependency: CargoDependency,
 }
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug)]

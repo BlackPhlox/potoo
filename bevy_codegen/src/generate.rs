@@ -127,8 +127,8 @@ impl BevyModel {
 }
 
 fn import_format(import: Import) -> String {
-    let name = import.dependency.crate_name;
-    let ps = import.dependency.crate_paths;
+    let name = import.dependency.name;
+    let ps = import.dependency.paths;
     let a = "{".to_string() + &ps.join(", ") + "}";
     let s = format!("use {}::{};\n", &name, a);
     s

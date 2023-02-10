@@ -1,4 +1,4 @@
-use crate::model::{BevyModel, Feature};
+use crate::model::{BevyModel, DependencyType, Feature};
 
 const BEVY_VERSION: &str = "0.9";
 
@@ -74,17 +74,19 @@ pub fn default_cargo_src_template(model: &BevyModel) -> String {
         .map(|d| {
             let mut s = "".to_owned();
             for b in d.dependencies.iter() {
-                let k = if b.crate_version.starts_with('{') {
-                    format!("{} = {}\n", b.crate_name, b.crate_version)
-                } else {
-                    format!("{} = \"{}\"\n", b.crate_name, b.crate_version)
+                let k = match &b.dependency_type {
+                    DependencyType::Crate(version) => format!("{0} = {version}", b.name),
+                    DependencyType::Git(git, branch) => {
+                        format!("{0} = {{ git = \"{git}\", branch =\"{branch}\" }}", b.name)
+                    }
+                    DependencyType::Path(path) => format!("{0} = {{ path = {path} }}", b.name),
                 };
                 s.push_str(&k);
             }
             s.to_string()
         })
         .collect::<Vec<String>>()
-        .join("");
+        .join("\n");
 
     let buf = format!(
         r#"[package]
