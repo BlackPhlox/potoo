@@ -75,11 +75,11 @@ pub fn default_cargo_src_template(model: &BevyModel) -> String {
             let mut s = "".to_owned();
             for b in d.dependencies.iter() {
                 let k = match &b.dependency_type {
-                    DependencyType::Crate(version) => format!("{0} = {version}", b.name),
+                    DependencyType::Crate(version) => format!("{0} = \"{version}\"", b.name),
                     DependencyType::Git(git, branch) => {
                         format!("{0} = {{ git = \"{git}\", branch =\"{branch}\" }}", b.name)
                     }
-                    DependencyType::Path(path) => format!("{0} = {{ path = {path} }}", b.name),
+                    DependencyType::Path(path) => format!("{0} = {{ path = \"{path}\" }}", b.name),
                 };
                 s.push_str(&k);
             }
