@@ -35,8 +35,13 @@ pub fn default_game_template() -> BevyModel {
     if use_editor_pls {
         let cd = CargoDependency {
             name: "bevy_editor_pls".to_string(),
-            dependency_type: DependencyType::Git("https://github.com/jakobhellermann/bevy_editor_pls".to_string(), "main".to_string()),
+            dependency_type: DependencyType::Git(
+                "https://github.com/jakobhellermann/bevy_editor_pls".to_string(),
+                Some("main".to_string()),
+                None,
+            ),
             paths: vec!["prelude::*".to_string()],
+            ..Default::default()
         };
         bevy_model.imports.push(Import {
             used: Used::Main,
@@ -48,7 +53,6 @@ pub fn default_game_template() -> BevyModel {
             dependencies: vec![cd],
         });
     }
-
 
     let setup_entities = System {
         name: "setup".to_string(),
@@ -333,6 +337,7 @@ pub(crate) fn is_outside_bounds(point: Vec2, bounds: (f32, f32, f32, f32)) -> bo
             name: "rand".to_string(),
             dependency_type: DependencyType::Crate("0.8".to_string()),
             paths: vec!["thread_rng".to_string(), "Rng".to_string()],
+            ..Default::default()
         },
     });
 
@@ -342,6 +347,7 @@ pub(crate) fn is_outside_bounds(point: Vec2, bounds: (f32, f32, f32, f32)) -> bo
             name: "bevy".to_string(),
             dependency_type: DependencyType::Crate("0.9".to_string()),
             paths: vec!["sprite::collide_aabb".to_string()],
+            ..Default::default()
         },
     });
 
@@ -349,8 +355,9 @@ pub(crate) fn is_outside_bounds(point: Vec2, bounds: (f32, f32, f32, f32)) -> bo
         used: Used::Systems,
         dependency: CargoDependency {
             name: "crate".to_string(),
-            dependency_type: DependencyType::Crate("0.0".to_string()),
+            dependency_type: DependencyType::Internal,
             paths: vec!["utilities::BOUNDS".to_string()],
+            ..Default::default()
         },
     });
 

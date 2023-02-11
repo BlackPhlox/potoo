@@ -178,13 +178,15 @@ pub struct CargoDependency {
     pub name: String,
     pub dependency_type: DependencyType,
     pub paths: Vec<String>,
+    pub features: Vec<String>,
 }
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub enum DependencyType {
     Crate(String),
-    Git(String, String),
+    Git(String, Option<String>, Option<String>),
     Path(String),
+    Internal,
 }
 
 impl Default for DependencyType {
