@@ -54,16 +54,6 @@ fn main() {
         ..Default::default()
     })));
 
-    /*
-    pm.apply(PotooEvents(AddRunTimeSystem(System{
-        name: "hello_world_system".to_string(),
-        param: vec![],
-        content: "println!(\"Hello World\")".to_string(),
-        visibility: "pub".to_string(),
-        attributes: vec!["no_mangle".to_string()],
-    })));
-    */
-
     println!("History:");
     println!("{:?}", pm.history);
 
@@ -122,7 +112,7 @@ fn main() {
         let _ = cargo_file.write_all(serde_json::to_string(&ser_prep).unwrap().as_bytes());
 
         let a = read_po2_file(format!("{bevy_folder}{po2_filename}"));
-        println!("Res {a:?}");
+        println!("Parsed BevyModel:\n {a:?}");
     }
 
     if build_and_run {

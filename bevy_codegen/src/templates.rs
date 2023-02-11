@@ -77,27 +77,30 @@ pub fn default_cargo_src_template(model: &BevyModel) -> String {
                 let k = match &b.dependency_type {
                     DependencyType::Crate(version) => Some(format!("{0} = \"{version}\"", b.name)),
                     DependencyType::Git(git, Some(branch), Some(rev)) => Some(format!(
-                        "{0} = {{ git = \"{git}\", branch = \"{branch}\", rev = \"{rev}\" }}",
+                        "{0} = {{ git = \"{git}\", branch = \"{branch}\", rev = \"{rev}\"",
                         b.name
                     )),
                     DependencyType::Git(git, Some(branch), None) => Some(format!(
-                        "{0} = {{ git = \"{git}\", branch = \"{branch}\" }}",
+                        "{0} = {{ git = \"{git}\", branch = \"{branch}\"",
                         b.name
                     )),
-                    DependencyType::Git(git, None, Some(rev)) => Some(format!(
-                        "{0} = {{ git = \"{git}\", rev = \"{rev}\" }}",
-                        b.name
-                    )),
+                    DependencyType::Git(git, None, Some(rev)) => {
+                        Some(format!("{0} = {{ git = \"{git}\", rev = \"{rev}\"", b.name))
+                    }
                     DependencyType::Git(git, None, None) => {
                         Some(format!("{0} = {{ git = \"{git}\"", b.name))
                     }
                     DependencyType::Path(path) => {
-                        Some(format!("{0} = {{ path = \"{path}\" }}", b.name))
+                        Some(format!("{0} = {{ path = \"{path}\"", b.name))
                     }
                     DependencyType::Internal => None,
                 };
                 if let Some(dep) = k {
                     s.push_str(&dep);
+                    if !&b.features.is_empty() {
+                        s.push_str(format!(", features = [{}]", b.features.join(",")).as_str());
+                    }
+                    s.push_str(" }");
                 }
             }
             s.to_string()

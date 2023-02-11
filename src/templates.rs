@@ -86,6 +86,21 @@ commands
     bevy_model.startup_systems.push(setup_entities);
 
     bevy_model.systems.push(System {
+        name: "contact_http".to_string(),
+        param: vec![(
+            "keyboard_input".to_string(),
+            "Res<Input<KeyCode>>".to_string(),
+        )],
+        content: r#"if keyboard_input.just_pressed(KeyCode::H) {
+println!("Hello World");
+//Send request to server
+}"#
+        .to_string(),
+        attributes: vec![],
+        ..Default::default()
+    });
+
+    bevy_model.systems.push(System {
         name: "player_movement_system".to_string(),
         param: vec![
             (

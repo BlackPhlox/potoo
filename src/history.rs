@@ -38,7 +38,11 @@ pub struct PotooEvents(pub PotooEvent);
 
 impl ProjectModel {
     pub fn apply(&mut self, event: PotooEvents) {
-        self.history.apply(&mut self.model, event);
+        self.history.apply(&mut self.model, event.clone());
+        match reload_get_type(event.clone().0) {
+            ReloadType::RequireReload => println!("Reload required for action: {:?}", event.0),
+            ReloadType::None => println!("Automatically hot-reloading for action: {:?}", event.0),
+        }
     }
 
     pub fn redo(&mut self) {
@@ -47,6 +51,11 @@ impl ProjectModel {
 
     pub fn undo(&mut self) {
         self.history.undo(&mut self.model);
+    }
+
+    pub fn save(&mut self) {
+        //Serialize BevyModel
+        //Serialize History and relate history to BevyModel
     }
 }
 
@@ -70,8 +79,8 @@ impl Action for PotooEvents {
                     .iter()
                     .position(|x| *x.name == c.name)
                     .expect("Component with name found");
-                let tmp = target.components.remove(index);
-                target.components.insert(index, tmp);
+                let _tmp = target.components.remove(index);
+                target.components.insert(index, c.clone());
             }
             PotooEvent::UpdateStartupSystem(s) => {
                 let index = target
@@ -79,8 +88,8 @@ impl Action for PotooEvents {
                     .iter()
                     .position(|x| *x.name == s.name)
                     .expect("Startup system with name found");
-                let tmp = target.startup_systems.remove(index);
-                target.startup_systems.insert(index, tmp);
+                let _tmp = target.startup_systems.remove(index);
+                target.startup_systems.insert(index, s.clone());
             }
             PotooEvent::UpdateRunTimeSystem(s) => {
                 let index = target
@@ -88,8 +97,8 @@ impl Action for PotooEvents {
                     .iter()
                     .position(|x| *x.name == s.name)
                     .expect("Runtime system with name found");
-                let tmp = target.systems.remove(index);
-                target.systems.insert(index, tmp);
+                let _tmp = target.systems.remove(index);
+                target.systems.insert(index, s.clone());
             }
         };
     }
@@ -110,8 +119,8 @@ impl Action for PotooEvents {
                     .iter()
                     .position(|x| *x.name == c.name)
                     .expect("Component with name found");
-                let tmp = target.components.remove(index);
-                target.components.insert(index, tmp);
+                let _tmp = target.components.remove(index);
+                target.components.insert(index, c.clone());
             }
             PotooEvent::UpdateStartupSystem(s) => {
                 let index = target
@@ -119,8 +128,8 @@ impl Action for PotooEvents {
                     .iter()
                     .position(|x| *x.name == s.name)
                     .expect("Startup system with name found");
-                let tmp = target.startup_systems.remove(index);
-                target.startup_systems.insert(index, tmp);
+                let _tmp = target.startup_systems.remove(index);
+                target.startup_systems.insert(index, s.clone());
             }
             PotooEvent::UpdateRunTimeSystem(s) => {
                 let index = target
@@ -128,8 +137,8 @@ impl Action for PotooEvents {
                     .iter()
                     .position(|x| *x.name == s.name)
                     .expect("Runtime system with name found");
-                let tmp = target.systems.remove(index);
-                target.systems.insert(index, tmp);
+                let _tmp = target.systems.remove(index);
+                target.systems.insert(index, s.clone());
             }
         };
     }
