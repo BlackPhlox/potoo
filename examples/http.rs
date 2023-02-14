@@ -3,7 +3,7 @@ use client::PotooClient;
 use server::PotooServer;
 
 fn main() {
-    let _potoo_server = PotooServer::new();
+    std::thread::spawn(move || PotooServer::new());
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PotooClient)
