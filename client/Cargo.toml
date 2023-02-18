@@ -18,3 +18,4 @@ syntect = { version = "5", optional = true, default-features = false, features =
 tokio = { version = "1.25", features = ["rt"]}
 bytes = "1.4.0"
 futures-lite = "1.12"
+bevy_codegen = {path = "../bevy_codegen"}

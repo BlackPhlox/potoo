@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
-use client::PotooClient;
+use bevy_codegen::{model::BevyModel, bevy_model_template::default_game_template};
+use client::{PotooClient, PotooClientConfig};
 use server::PotooServer;
 
 fn main() {
@@ -8,6 +9,10 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PotooClient)
+        .insert_resource(PotooClientConfig {
+            ..Default::default()
+        })
+        .insert_resource(default_game_template())
         .add_startup_system(setup)
         .run();
 }

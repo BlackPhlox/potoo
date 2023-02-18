@@ -396,6 +396,7 @@ dependencies = [
 name = "bevy_codegen"
 version = "0.1.0"
 dependencies = [
+ "bevy",
  "codegen",
  "rust-format",
  "serde",
@@ -1228,6 +1229,7 @@ name = "client"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_codegen",
  "bevy_editor_pls",
  "bytes",
  "futures-lite",

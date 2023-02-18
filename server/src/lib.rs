@@ -1,4 +1,4 @@
-use std::{future::Future, task::Poll, thread};
+use std::thread;
 
 use tokio::{net::TcpListener, runtime::Builder};
 
@@ -29,7 +29,7 @@ impl PotooServer {
 
     pub async fn start_async(self) -> () {
         let listener = TcpListener::bind(&self.ip_port).await.unwrap();
-        println!("Started server on {}", self.ip_port,);
+        println!("Started server on {}", self.ip_port);
         let _r = mini_redis::server::run(listener, tokio::signal::ctrl_c()).await;
     }
 }

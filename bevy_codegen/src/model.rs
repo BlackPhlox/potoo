@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use bevy::prelude::Resource;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
@@ -15,7 +16,7 @@ pub struct ConfirmPo2Version {
     pub model: BevyModel,
 }
 
-#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Default, Debug, Resource)]
 pub struct BevyModel {
     pub meta: Meta,
     pub bevy_settings: Settings,
