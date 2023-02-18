@@ -1,9 +1,10 @@
 use bevy::prelude::*;
+
 use client::PotooClient;
 use server::PotooServer;
 
 fn main() {
-    std::thread::spawn(move || PotooServer::new());
+    PotooServer::default().start();
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PotooClient)

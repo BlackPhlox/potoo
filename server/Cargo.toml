@@ -6,3 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tokio = { version = "1.25", features = ["rt"]}
+mini-redis = "0.4.1"
+bytes = "1.4.0"
