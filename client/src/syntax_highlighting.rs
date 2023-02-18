@@ -2,6 +2,7 @@ use bevy_editor_pls::egui;
 use egui::text::LayoutJob;
 
 /// View some code with syntax highlighting and selection.
+#[allow(dead_code)]
 pub fn code_view_ui(ui: &mut egui::Ui, mut code: &str) {
     let language = "rs";
     let theme = CodeTheme::from_memory(ui.ctx());
@@ -137,6 +138,7 @@ impl Default for CodeTheme {
 }
 
 impl CodeTheme {
+    #[allow(dead_code)]
     pub fn from_style(style: &egui::Style) -> Self {
         if style.visuals.dark_mode {
             Self::dark()

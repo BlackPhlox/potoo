@@ -198,7 +198,7 @@ impl Default for DependencyType {
 
 impl Display for DependencyType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let _ = write!(f, "{:?}", self);
+        let _ = write!(f, "{self:?}");
         Ok(())
     }
 }
