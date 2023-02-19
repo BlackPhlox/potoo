@@ -101,16 +101,16 @@ impl View for CodeEditor {
             ui.fonts().layout_job(layout_job)
         };
 
-        egui::ScrollArea::vertical().show(ui, |ui| {
-            ui.add(
-                egui::TextEdit::multiline(code)
-                    .font(egui::TextStyle::Monospace) // for cursor height
-                    .code_editor()
-                    .desired_rows(10)
-                    .lock_focus(true)
-                    .desired_width(f32::INFINITY)
-                    .layouter(&mut layouter),
-            );
-        });
+        //egui::ScrollArea::vertical().show(ui, |ui| {
+        ui.add(
+            egui::TextEdit::multiline(code)
+                .font(egui::TextStyle::Monospace) // for cursor height
+                .code_editor()
+                .desired_rows(10)
+                .lock_focus(true)
+                .desired_width(f32::INFINITY)
+                .layouter(&mut layouter),
+        );
+        //});
     }
 }

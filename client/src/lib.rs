@@ -3,12 +3,13 @@ mod syntax_highlighting;
 
 use std::thread;
 
-use bevy::prelude::{App, Plugin, ResMut, Resource, World};
+use bevy::prelude::{App, Mut, Plugin, ResMut, Resource, World};
 use bevy_codegen::model::BevyModel;
 use bevy_editor_pls::{
     default_windows::hierarchy::HierarchyWindow,
     editor_window::{EditorWindow, EditorWindowContext},
-    egui, AddEditorWindow, EditorPlugin,
+    egui::{self, ScrollArea},
+    AddEditorWindow, EditorPlugin,
 };
 use code_editor::{CodeEditor, View};
 use mini_redis::blocking_client::BlockingClient;
@@ -82,70 +83,83 @@ impl EditorWindow for PotooClientEditorWindow {
     fn ui(world: &mut World, cx: EditorWindowContext, ui: &mut egui::Ui) {
         let _currently_inspected = &cx.state::<HierarchyWindow>().unwrap().selected;
 
-        if let Some(mut ce) = world.get_resource_mut::<CodeEditor>() {
+        world.resource_scope(|world, mut ce: Mut<CodeEditor>| {
             ce.ui(ui);
-            let code = ce.code.clone();
-            if ui.button("Add System").clicked() {
+            if ui.button("Save").clicked() {
                 if let Some(mut client_config) = world.get_resource_mut::<PotooClientConfig>() {
                     if let Some(client) = &mut client_config.client {
-                        let _ = client.publish("ch1", code.into());
+                        let _ = client.publish("ch1", ce.code.clone().into());
                     }
                 }
             }
-        };
 
-        if let Some(bm) = world.get_resource::<BevyModel>() {
-            //ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
-            ui.collapsing("Meta", |ui| {
-                ui.label(format!("      {:?}", bm.meta));
-                _ = ui.button("Edit");
-            });
+            if let Some(mut bm) = world.get_resource_mut::<BevyModel>() {
+                ScrollArea::vertical()
+                    .auto_shrink([false; 2])
+                    .show(ui, |ui| {
+                        ui.collapsing("Meta", |ui| {
+                            ui.label(format!("      {:?}", bm.meta));
+                            _ = ui.button("Edit");
+                        });
 
-            ui.collapsing("Plugins", |ui| {
-                _ = ui.button("Add Plugin (+)");
-                ui.spacing();
-                for plugin in &bm.plugins {
-                    ui.label(format!("      {plugin:?}"));
-                    let mut str = "Edit : ".to_string();
-                    str.push_str(plugin.name.as_str());
-                    _ = ui.button(str);
-                    _ = ui.button("X");
-                }
-            });
+                        ui.collapsing("Plugins", |ui| {
+                            _ = ui.button("Add Plugin (+)");
+                            ui.spacing();
+                            for plugin in &mut bm.plugins {
+                                ui.horizontal(|ui| {
+                                    //ui.label(format!("      {system:?}"));
+                                    if ui.button("Edit").clicked() {
+                                        ce.code = plugin.name.clone();
+                                    }
+                                    _ = ui.label(plugin.name.as_str());
+                                    _ = ui.button("X");
+                                });
+                            }
+                        });
 
-            ui.collapsing("Components", |ui| {
-                _ = ui.button("Add Component (+)");
-                for component in &bm.components {
-                    ui.label(format!("      {component:?}"));
-                    let mut str = "Edit : ".to_string();
-                    str.push_str(component.name.as_str());
-                    _ = ui.button(str);
-                    _ = ui.button("X");
-                }
-            });
+                        ui.collapsing("Components", |ui| {
+                            _ = ui.button("Add Component (+)");
+                            for component in &bm.components {
+                                ui.horizontal(|ui| {
+                                    //ui.label(format!("      {system:?}"));
+                                    if ui.button("Edit").clicked() {
+                                        ce.code = component.name.clone();
+                                    }
+                                    _ = ui.label(component.name.as_str());
+                                    _ = ui.button("X");
+                                });
+                            }
+                        });
 
-            ui.collapsing("Startup Systems", |ui| {
-                _ = ui.button("Add Startup Systems (+)");
-                for startup_system in &bm.startup_systems {
-                    ui.label(format!("      {startup_system:?}"));
-                    let mut str = "Edit : ".to_string();
-                    str.push_str(startup_system.name.as_str());
-                    _ = ui.button(str);
-                    _ = ui.button("X");
-                }
-            });
+                        ui.collapsing("Startup Systems", |ui| {
+                            _ = ui.button("Add Startup Systems (+)");
+                            for startup_system in &bm.startup_systems {
+                                ui.horizontal(|ui| {
+                                    //ui.label(format!("      {system:?}"));
+                                    if ui.button("Edit").clicked() {
+                                        ce.code = startup_system.content.clone();
+                                    }
+                                    _ = ui.label(startup_system.name.as_str());
+                                    _ = ui.button("X");
+                                });
+                            }
+                        });
 
-            ui.collapsing("Runtime Systems", |ui| {
-                _ = ui.button("Add Runtime Systems (+)");
-                for system in &bm.systems {
-                    ui.label(format!("      {system:?}"));
-                    let mut str = "Edit : ".to_string();
-                    str.push_str(system.name.as_str());
-                    _ = ui.button(str);
-                    _ = ui.button("X");
-                }
-            });
-            //});
-        }
+                        ui.collapsing("Runtime Systems", |ui| {
+                            _ = ui.button("Add Runtime Systems (+)");
+                            for system in &bm.systems {
+                                ui.horizontal(|ui| {
+                                    //ui.label(format!("      {system:?}"));
+                                    if ui.button("Edit").clicked() {
+                                        ce.code = system.content.clone();
+                                    }
+                                    _ = ui.label(system.name.as_str());
+                                    _ = ui.button("X");
+                                });
+                            }
+                        });
+                    });
+            }
+        });
     }
 }
