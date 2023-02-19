@@ -5,7 +5,7 @@ pub fn parse_file(file: syn::File) {
         match item {
             syn::Item::Fn(fn_item) if fn_item.sig.ident.to_string().eq("main") => {
                 if let Some(syn::Stmt::Semi(x, _)) = fn_item.block.stmts.first() {
-                    println!("main1:\n{x:?}");
+                    println!("main:\n{x:?}");
                     let mut r = parse_fn(vec![], Box::new(x.clone()));
                     r.reverse();
                     println!("{r:?}");
@@ -52,7 +52,6 @@ fn parse_fn(mut init_app_builder: Vec<(String, String)>, expr: Box<Expr>) -> Vec
                             }),
                             _ => None,
                         };
-                        println!("{member_name:?},{expr:?}");
                         (member_name, expr)
                     });
                     let fmt_fields = absct_fields.filter_map(|(a, b)| match (a, b) {
