@@ -1,6 +1,6 @@
 use syn::Expr;
 
-pub fn parse_file(file: syn::File) {
+pub fn parse_file(file: syn::File) -> Option<Vec<(String, String)>> {
     for item in file.items {
         match item {
             syn::Item::Fn(fn_item) if fn_item.sig.ident.to_string().eq("main") => {
@@ -9,11 +9,13 @@ pub fn parse_file(file: syn::File) {
                     let mut r = parse_fn(vec![], Box::new(x.clone()));
                     r.reverse();
                     println!("{r:?}");
+                    return Some(r);
                 }
             }
             _ => (),
         }
     }
+    None
 }
 
 fn parse_fn(mut init_app_builder: Vec<(String, String)>, expr: Box<Expr>) -> Vec<(String, String)> {
@@ -77,4 +79,35 @@ fn parse_fn(mut init_app_builder: Vec<(String, String)>, expr: Box<Expr>) -> Vec
         _ => (),
     };
     init_app_builder
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_building_a_bevy_app_finds_systems() {
+        let syntax = syn::parse_file(
+            r#"fn main() {
+    App::new()
+        .insert_resource(Msaa { samples: 4 })
+        .add_plugins(DefaultPlugins)
+        .add_startup_system(setup)
+        .add_system(fade_transparency)
+        .run();
+    }"#,
+        )
+        .expect("Unable to parse file");
+        let res = parse_file(syntax);
+        assert_eq!(
+            res,
+            Some(vec![
+                ("insert_resource".to_string(), "Msaa{samples:4}".to_string()),
+                ("add_plugins".to_string(), "DefaultPlugins".to_string()),
+                ("add_startup_system".to_string(), "setup".to_string()),
+                ("add_system".to_string(), "fade_transparency".to_string()),
+                ("run".to_string(), "".to_string())
+            ])
+        );
+    }
 }
