@@ -175,16 +175,34 @@ D -->|Terminal: Hot-reloading & Recompilation|C0
 
 # Usage / Getting started
 
-## Linux and macOS
+The project is still in such an early stage that currently the main method and accompaning examples is demos of the current progress of the project.
 
-```sh
-# Linux not tested yet
-cargo run
+The project has yet to be run using linux and macos, please let us know by creating an issue.
+
+## main
+
+When running the project, the entrypoint/main is currently simulating the process workflow for starting a new project, adding some component in the form of events, exporting the code and running it. The step-by-step is:
+- Get default template
+- Add some components using undoable events
+- Print the different formats
+- Project and code generaetion
+- Generate .po2 file
+- Parse file
+- Build and run the generated project and code
+
+This can be done by cloning the project and calling the command:
+```
+cargo r
 ```
 
-## Windows
+## http
 ```
-cargo run
+cargo r --example http
+```
+
+## parse_bevy
+```
+cargo r --example parse_bevy
 ```
 
 # Thanks and Alternatives
