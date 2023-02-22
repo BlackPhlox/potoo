@@ -5,7 +5,7 @@ pub fn parse_file(file: syn::File) -> Option<Vec<(String, String)>> {
         match item {
             syn::Item::Fn(fn_item) if fn_item.sig.ident.to_string().eq("main") => {
                 if let Some(syn::Stmt::Semi(x, _)) = fn_item.block.stmts.first() {
-                    println!("main:\n{x:?}");
+                    println!("main:\n{x:#?}");
                     let mut r = parse_fn(vec![], Box::new(x.clone()));
                     r.reverse();
                     println!("{r:?}");
@@ -22,7 +22,6 @@ fn parse_fn(mut init_app_builder: Vec<(String, String)>, expr: Box<Expr>) -> Vec
     match *expr {
         syn::Expr::Call(_) => (),
         syn::Expr::MethodCall(ref x) => {
-            println!("Method: {}", x.method);
             let argument = x.args.clone().into_iter().filter_map(|f| match f {
                 Expr::Path(expr_path) => expr_path
                     .path
@@ -71,9 +70,30 @@ fn parse_fn(mut init_app_builder: Vec<(String, String)>, expr: Box<Expr>) -> Vec
                 _ => None,
             });
             let c = argument.collect::<Vec<String>>();
+            let tf = match x.turbofish.clone() {
+                Some(x) => {
+                    let res = x.args.into_iter().map(|f| match f {
+                        syn::GenericMethodArgument::Type(y) => match y {
+                            syn::Type::Path(z) => z.path.segments.first().unwrap().ident.to_string(),
+                            _ => "".to_string(),
+                        },
+                        _ => "".to_string(),
+                    }).collect::<Vec<String>>().join(",");
+                    if res.is_empty(){
+                        None
+                    } else {
+                        Some(res)
+                    }
+                },
+                None => None,
+            };
+            let method = match tf {
+                Some(y) => x.method.to_string() + "::<" + &y + ">",
+                None => x.method.to_string(),
+            };
+            println!("Method: {:?}", method);
             println!("Arg: {c:?}");
-            //println!("Other: {:?}", x);
-            init_app_builder.push((x.method.to_string(), c.join(",")));
+            init_app_builder.push((method, c.join(",")));
             return parse_fn(init_app_builder, x.receiver.clone());
         }
         _ => (),
@@ -93,6 +113,7 @@ mod tests {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
+        .test::<A,B>()
         .add_system(fade_transparency)
         .run();
     }"#,
@@ -105,6 +126,7 @@ mod tests {
                 ("insert_resource".to_string(), "Msaa{samples:4}".to_string()),
                 ("add_plugins".to_string(), "DefaultPlugins".to_string()),
                 ("add_startup_system".to_string(), "setup".to_string()),
+                ("test::<A,B>".to_string(), "".to_string()),
                 ("add_system".to_string(), "fade_transparency".to_string()),
                 ("run".to_string(), "".to_string())
             ])
