@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use bevy_codegen::{bevy_model_template::default_game_template, model::BevyModel};
+use bevy_codegen::bevy_model_template::default_game_template;
 use client::{PotooClient, PotooClientConfig};
 use server::PotooServer;
 
