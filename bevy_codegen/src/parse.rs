@@ -1,7 +1,7 @@
 use syn::{Expr, UseGroup, UseTree};
 
 pub fn parse_file(file: syn::File) -> Option<ParseBevyModel> {
-    println!("all:\n{file:#?}");
+    //println!("all:\n{file:#?}");
     let mut pbm = ParseBevyModel::default();
     let mut imports = vec![];
     for item in file.items {
@@ -86,8 +86,8 @@ fn parse_group(group: UseGroup) -> Vec<String> {
 
 #[derive(PartialEq, Eq, Debug, Default)]
 pub struct ParseBevyModel {
-    imports: Vec<String>,
-    app_builder: Vec<(String, String)>,
+    pub imports: Vec<String>,
+    pub app_builder: Vec<(String, String)>,
 }
 
 fn parse_fn(mut init_app_builder: ParseBevyModel, expr: Box<Expr>) -> ParseBevyModel {

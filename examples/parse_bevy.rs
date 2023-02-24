@@ -1,8 +1,15 @@
-use bevy_codegen::parse::parse_file;
+use bevy_codegen::{
+    model::BevyModel,
+    parse::{parse_file, ParseBevyModel},
+};
 
 fn main() {
     let syntax = syn::parse_file(
-        r#"fn main() {
+        r#"
+use bevy::prelude::*;
+
+fn main() {
+
 App::new()
     .insert_resource(Msaa { samples: 4 })
     .add_plugins(DefaultPlugins)
@@ -12,5 +19,10 @@ App::new()
 }"#,
     )
     .expect("Unable to parse file");
-    parse_file(syntax);
+    let pbm = parse_file(syntax);
+    println!("{pbm:?}");
+    if let Some(bevy_model) = pbm {
+        let bevy_model: BevyModel = bevy_model.into();
+        println!("{bevy_model:?}");
+    }
 }

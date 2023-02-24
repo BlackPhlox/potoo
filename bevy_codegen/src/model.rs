@@ -3,6 +3,8 @@ use std::fmt::Display;
 use bevy::prelude::Resource;
 use serde::{Deserialize, Serialize};
 
+use crate::parse::ParseBevyModel;
+
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
 pub struct ReadPo2Version {
     pub po2_version: Po2Version,
@@ -341,5 +343,26 @@ impl Display for BevyModel {
         });
 
         Ok(())
+    }
+}
+
+impl From<ParseBevyModel> for BevyModel {
+    fn from(value: ParseBevyModel) -> Self {
+        let imports = value.imports.into_iter().map(|f| {
+            let name = f.split("::").next().unwrap().to_string();
+            Import {
+                dependency: CargoDependency {
+                    dependency_type: DependencyType::Crate(name.clone()),
+                    name,
+                    paths: vec![f],
+                    ..Default::default()
+                },
+                ..Default::default()
+            }
+        });
+        BevyModel {
+            imports: imports.collect(),
+            ..Default::default()
+        }
     }
 }
