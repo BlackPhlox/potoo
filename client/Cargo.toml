@@ -9,8 +9,8 @@ edition = "2021"
 default = ["syntect"]
 
 [dependencies]
-bevy = { version = "0.9", default-features = false }
-bevy_editor_pls = { version = "0.2" }
+bevy = { version = "0.10", default-features = false }
+bevy_editor_pls = { version = "0.3" }
 mini-redis = "0.4.1"
 syntect = { version = "5", optional = true, default-features = false, features = [
     "default-fancy",

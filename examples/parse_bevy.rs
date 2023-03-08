@@ -1,7 +1,4 @@
-use bevy_codegen::{
-    model::BevyModel,
-    parse::{parse_file, ParseBevyModel},
-};
+use bevy_codegen::{model::BevyModel, parse::parse_file};
 
 fn main() {
     let syntax = syn::parse_file(
