@@ -1,6 +1,6 @@
 use crate::model::{BevyModel, DependencyType, Feature};
 
-const BEVY_VERSION: &str = "0.9";
+const BEVY_VERSION: &str = "0.10";
 
 pub fn feature_write(features: &Vec<Feature>) -> String {
     let mut features_str = "".to_owned();
