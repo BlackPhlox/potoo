@@ -105,9 +105,9 @@ potoo --help
 potoo --new bevy_test
 
 # Create a new bevy project types called bevy_test, app is default
-potoo --new bevy_test_app --template app
-potoo --new bevy_test_app --template game
-potoo --new bevy_test_app --template plugin
+potoo --new bevy_test --template app
+potoo --new bevy_test --template game
+potoo --new bevy_test --template plugin
 
 # Import a bevy project to potoo format -> .po2
 potoo --import .
