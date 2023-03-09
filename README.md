@@ -16,6 +16,31 @@ Started as [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor
 
 What sets Potoo apart from other editors is its ability to import and export to Bevy code, freeing developers from dependency to Potoo. With Potoo, you can modify runtime-systems on the fly using hot-reloading, making game development a seamless and enjoyable experience.
 
+```mermaid
+flowchart LR
+
+%% Boxes
+A0[Bevy Code]
+A2[.po2]
+A1[Potoo]
+A3[Executables]
+
+%% Relations
+
+A0 -->|Import| A1
+A1 -->|Export| A0
+A1 -->|Export Project| A2
+A2 -->|Import Project| A1
+A1 -->|Export to Targets| A3
+
+%% Groups
+%%subgraph "Formats"
+%% A0
+%% A2
+%%end
+
+```
+
 Potoo is still in a very experimental prototype phase of development, but we're excited about the possibilities it offers for game development in Bevy. Try it out and [let us know what you think](https://github.com/BlackPhlox/potoo/issues/new)! 
 
 # Planned features
@@ -24,7 +49,7 @@ Potoo is still in a very experimental prototype phase of development, but we're 
 Potoo is using [bevy_editor_pls](https://github.com/jakobhellermann/bevy_editor_pls) ([egui](https://github.com/emilk/egui)) for the ui and is dependent on that bevy_editor_pls is up-to-date with egui's updates and latest functionality. In the future, potoo might use bevy_egui directly for faster development and usages of egui features.
 
 ![](https://img.shields.io/static/v1?label=Status&message=In%20Progress&color=blue)</br>
-Potoo is focusing on getting the [bevy_editor_pls](https://github.com/jakobhellermann/bevy_editor_pls) ([egui](https://github.com/emilk/egui)) dependency working for bevy `0.9` and hot-reloading with the editor.
+Potoo is focusing on getting the [bevy_editor_pls](https://github.com/jakobhellermann/bevy_editor_pls) ([egui](https://github.com/emilk/egui)) dependency working for bevy `0.10` and hot-reloading with the editor.
 
 ## Import & Export
 Exports to all platforms: With Potoo, you can easily export your games to all types of platforms, making it possible to reach a wide range of audiences. While minimizing the executable size.
