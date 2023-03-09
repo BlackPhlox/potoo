@@ -3042,9 +3042,9 @@ checksum = "6ac9a59f73473f1b8d852421e59e64809f025994837ef743615c6d0c5b305160"
 
 [[package]]
 name = "plist"
-version = "1.4.1"
+version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9469799ca90293a376f68f6fcb8f11990d9cff55602cfba0ba83893c973a7f46"
+checksum = "ffac6a51110e97610dd3ac73e34a65b27e56a1e305df41bad1f616d8e1cb22f4"
 dependencies = [
  "base64 0.21.0",
  "indexmap",
@@ -3149,9 +3149,9 @@ checksum = "74605f360ce573babfe43964cbe520294dcb081afbf8c108fc6e23036b4da2df"
 
 [[package]]
 name = "quick-xml"
-version = "0.26.0"
+version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f50b1c63b38611e7d4d7f68b82d3ad0cc71a2ad2e7f61fc10f1328d917c93cd"
+checksum = "ffc053f057dd768a56f62cd7e434c42c831d296968997e9ac1f76ea7c2d14c41"
 dependencies = [
  "memchr",
 ]
@@ -3340,18 +3340,18 @@ checksum = "1792db035ce95be60c3f8853017b3999209281c24e2ba5bc8e59bf97a0c590c1"
 
 [[package]]
 name = "serde"
-version = "1.0.153"
+version = "1.0.154"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a382c72b4ba118526e187430bb4963cd6d55051ebf13d9b25574d379cc98d20"
+checksum = "8cdd151213925e7f1ab45a9bbfb129316bd00799784b174b7cc7bcd16961c49e"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.153"
+version = "1.0.154"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ef476a5790f0f6decbc66726b6e5d63680ed518283e64c7df415989d880954f"
+checksum = "4fc80d722935453bcafdc2c9a73cd6fac4dc1938f0346035d84bf99fa9e33217"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3547,9 +3547,9 @@ dependencies = [
 
 [[package]]
 name = "taffy"
-version = "0.3.5"
+version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d8d943e338892c450f928c4b529b0be0160f8a9f4aa5e1596a57299bacfd86d"
+checksum = "e38edd8e57ffadcbdaf4c60c8738a8938318b4c4d3d281ae369033b80e5efa75"
 dependencies = [
  "arrayvec",
  "num-traits",
@@ -3859,9 +3859,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-bidi"
-version = "0.3.10"
+version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d54675592c1dbefd78cbd98db9bacd89886e1ca50692a0692baefffdeb92dd58"
+checksum = "524b68aca1d05e03fdf03fcdce2c6c94b6daf6d16861ddaa7e4f2b6638a9052c"
 
 [[package]]
 name = "unicode-ident"

@@ -3,7 +3,10 @@ mod syntax_highlighting;
 
 use std::thread;
 
-use bevy::prelude::{App, Mut, Plugin, ResMut, Resource, World};
+use bevy::{
+    diagnostic::{EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin},
+    prelude::{App, Mut, Plugin, ResMut, Resource, World},
+};
 use bevy_codegen::model::BevyModel;
 use bevy_editor_pls::{
     default_windows::hierarchy::HierarchyWindow,
@@ -23,6 +26,8 @@ impl Plugin for PotooClient {
             .init_resource::<CodeEditor>()
             .init_resource::<BevyModel>()
             .add_startup_system(setup_client)
+            .add_plugin(FrameTimeDiagnosticsPlugin)
+            .add_plugin(EntityCountDiagnosticsPlugin)
             .add_plugin(EditorPlugin)
             .add_editor_window::<PotooClientEditorWindow>();
     }
