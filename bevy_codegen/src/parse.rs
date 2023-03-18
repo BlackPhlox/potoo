@@ -7,7 +7,7 @@ pub fn parse_file(file: syn::File) -> Option<ParseBevyModel> {
     for item in file.items {
         match item {
             syn::Item::Fn(fn_item) if fn_item.sig.ident.to_string().eq("main") => {
-                if let Some(syn::Stmt::Semi(x, _)) = fn_item.block.stmts.first() {
+                if let Some(syn::Stmt::Expr(x, _)) = fn_item.block.stmts.first() {
                     //println!("main:\n{x:#?}");
                     let mut r = parse_fn(ParseBevyModel::default(), Box::new(x.clone()));
                     r.app_builder.reverse();
@@ -121,6 +121,8 @@ fn parse_fn(mut init_app_builder: ParseBevyModel, expr: Box<Expr>) -> ParseBevyM
                                 syn::Lit::Float(x) => x.token().to_string(),
                                 syn::Lit::Bool(x) => x.token().to_string(),
                                 syn::Lit::Verbatim(x) => x.to_string(),
+                                _ => todo!(),
+                                
                             }),
                             _ => None,
                         };
@@ -147,7 +149,7 @@ fn parse_fn(mut init_app_builder: ParseBevyModel, expr: Box<Expr>) -> ParseBevyM
                         .args
                         .into_iter()
                         .map(|f| match f {
-                            syn::GenericMethodArgument::Type(syn::Type::Path(z)) => {
+                            syn::GenericArgument::Type(syn::Type::Path(z)) => {
                                 z.path.segments.first().unwrap().ident.to_string()
                             }
                             _ => "".to_string(),
