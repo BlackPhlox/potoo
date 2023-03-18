@@ -90,6 +90,7 @@ pub struct ParseBevyModel {
     pub app_builder: Vec<(String, String)>,
 }
 
+#[allow(clippy::boxed_local)]
 fn parse_fn(mut init_app_builder: ParseBevyModel, expr: Box<Expr>) -> ParseBevyModel {
     match *expr {
         syn::Expr::MethodCall(ref x) => {
@@ -122,7 +123,6 @@ fn parse_fn(mut init_app_builder: ParseBevyModel, expr: Box<Expr>) -> ParseBevyM
                                 syn::Lit::Bool(x) => x.token().to_string(),
                                 syn::Lit::Verbatim(x) => x.to_string(),
                                 _ => todo!(),
-                                
                             }),
                             _ => None,
                         };
