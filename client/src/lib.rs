@@ -28,7 +28,7 @@ impl Plugin for PotooClient {
             .add_startup_system(setup_client)
             .add_plugin(FrameTimeDiagnosticsPlugin)
             .add_plugin(EntityCountDiagnosticsPlugin)
-            .add_plugin(EditorPlugin)
+            .add_plugin(EditorPlugin::default())
             .add_editor_window::<PotooClientEditorWindow>();
     }
 }
