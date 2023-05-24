@@ -14,6 +14,11 @@ pub fn parse_file(file: syn::File) -> Option<ParseBevyModel> {
                     //println!("{:?}", r.app_builder);
                     pbm.app_builder = r.app_builder;
                 }
+            },
+            syn::Item::Fn(fn_item) => {
+                // Added to system struct (Not defined yet, see generate.rs)
+                let a = format!("{:?}", fn_item);
+                pbm.code.push(a);
             }
             syn::Item::Use(use_item) => {
                 let rs = parse_use(vec![], use_item.tree).join("::");
@@ -88,6 +93,7 @@ fn parse_group(group: UseGroup) -> Vec<String> {
 pub struct ParseBevyModel {
     pub imports: Vec<String>,
     pub app_builder: Vec<(String, String)>,
+    pub code: Vec<String>,
 }
 
 #[allow(clippy::boxed_local)]

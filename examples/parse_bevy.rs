@@ -13,7 +13,17 @@ App::new()
     .add_startup_system(setup)
     .add_system(fade_transparency)
     .run();
-}"#,
+}
+
+fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+
+}
+
+"#,
     )
     .expect("Unable to parse file");
     let pbm = parse_file(syntax);
