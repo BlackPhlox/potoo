@@ -245,6 +245,7 @@ cargo r --example parse_bevy
 - [DGriffin91's Ridiculous bevy hot reloading](https://github.com/DGriffin91/ridiculous_bevy_hot_reloading)
 - [bevy_plugin_analyzer](https://github.com/atbentley/bevy_plugin_analyzer)
 - [SneakyBerry's Bevy Editor](https://github.com/SneakyBerry)
+- [rewin123's space_editor](https://github.com/rewin123/space_editor)
 
 # Licensing
 The project is under dual license MIT and Apache-2.0
