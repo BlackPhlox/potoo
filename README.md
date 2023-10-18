@@ -12,7 +12,7 @@
 
 The Cursed Editor for [Bevy](https://bevyengine.org).
 
-Started as [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor), Potoo is an experimental, code-first game editor that helps you create and modify games, apps, bevy plugins, and examples.
+Started as [bevy_cursed_editor](https://github.com/BlackPhlox/bevy_cursed_editor), Potoo is an experimental, code-first game editor framework that helps you create, extend and modify your own game engine to support your games, apps, bevy plugins, mods?, and examples.
 
 ⚠ **Feedback** - _Potoo is at a very early stage so any and all feedback is highly appreciated_ ⚠
 
