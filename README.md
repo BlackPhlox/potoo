@@ -80,7 +80,7 @@ Potoo allows you to modify runtime-systems in real-time, without having to resta
 
 Some things like data structures cannot be changed during hot-reloading runtime, `potoo` knows this and only reloads your entire application when required, to reduce friction for the user.
 
-To achieve hot-reloading, potoo uses [hot-lib-reloader](https://github.com/rksm/hot-lib-reloader-rs) with a strategic module setup to maximize hot-reloading support.
+To achieve hot-reloading, potoo uses [hot-lib-reloader](https://github.com/rksm/hot-lib-reloader-rs) with a strategic module setup to maximize hot-reloading support. However [dexterous_developer](https://github.com/lee-orr/dexterous_developer) looks very promising for providing further support for hot reloading in Bevy, thus is something that is being looked at.
 
 ![](https://img.shields.io/static/v1?label=Status&message=In%20Progress&color=blue)</br>
 Works as of now, though there is a mismatch with windows vs. linux, windows have to compile system library twice. This extra work is currently also forced unto linux users. Once event structure is finalized work on hot-reloading can continue.
