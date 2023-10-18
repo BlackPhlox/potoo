@@ -145,7 +145,7 @@ potoo export . --targets ["x86_64-pc-windows-msvc","wasm32-unknown-unknown","arm
 
 ## Automated Testing
 ![](https://img.shields.io/static/v1?label=Status&message=Planned&color=critical)</br>
-Create a framework based on templates for testing systems to catch errors, such as instantiations check prior to running bevy at runtime.
+Create a framework based on templates for testing systems to catch errors, such as instantiation and query logic checks prior to running bevy at runtime.
 
 # How does Potoo work?
 The layout of how setup in terms of plugin, client-server and reloading.
