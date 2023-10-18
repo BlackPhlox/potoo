@@ -109,7 +109,7 @@ Using mini-redis, a pubsub server is setup to run and respond to published event
 
 ## Code Editor
 ![](https://img.shields.io/static/v1?label=Status&message=Prototyping&color=yellow)</br>
-Using [egui's demo code_editor](https://github.com/emilk/egui/blob/master/crates/egui_demo_lib/src/demo/code_editor.rs), but is looking into auto-open using VSC.
+Looking to using [egui's demo code_editor](https://github.com/emilk/egui/blob/master/crates/egui_demo_lib/src/demo/code_editor.rs), but VSC and vim support should be prioritized.
 
 ## Level/Scene Editing
 ![](https://img.shields.io/static/v1?label=Status&message=Planned&color=critical)</br>
