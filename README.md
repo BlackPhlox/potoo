@@ -129,18 +129,18 @@ potoo --dir .
 potoo --help
 
 # Create a new bevy project called bevy_test
-potoo --new bevy_test
+potoo new bevy_test
 
 # Create a new bevy project types called bevy_test, app is default
-potoo --new bevy_test --template app
-potoo --new bevy_test --template game
-potoo --new bevy_test --template plugin
+potoo new bevy_test --template app
+potoo new bevy_test --template game
+potoo new bevy_test --template plugin
 
 # Import a bevy project to potoo format -> .po2
-potoo --import .
+potoo import .
 
 # Export a bevy project to multiple executables, current os is default
-potoo --export . --targets ["x86_64-pc-windows-msvc","wasm32-unknown-unknown","armv7-linux-androideabi"]
+potoo export . --targets ["x86_64-pc-windows-msvc","wasm32-unknown-unknown","armv7-linux-androideabi"]
 ```
 
 ## Automated Testing
