@@ -109,7 +109,7 @@ Using mini-redis, a pubsub server is setup to run and respond to published event
 
 ## Code Editor
 ![](https://img.shields.io/static/v1?label=Status&message=Prototyping&color=yellow)</br>
-Using [egui's demo code_editor](https://github.com/emilk/egui/blob/master/crates/egui_demo_lib/src/demo/code_editor.rs), but is looking into auto-open using VSC.
+Looking to using [egui's demo code_editor](https://github.com/emilk/egui/blob/master/crates/egui_demo_lib/src/demo/code_editor.rs), but VSC and vim support should be prioritized.
 
 ## Level/Scene Editing
 ![](https://img.shields.io/static/v1?label=Status&message=Planned&color=critical)</br>
@@ -129,23 +129,23 @@ potoo --dir .
 potoo --help
 
 # Create a new bevy project called bevy_test
-potoo --new bevy_test
+potoo new bevy_test
 
 # Create a new bevy project types called bevy_test, app is default
-potoo --new bevy_test --template app
-potoo --new bevy_test --template game
-potoo --new bevy_test --template plugin
+potoo new bevy_test --template app
+potoo new bevy_test --template game
+potoo new bevy_test --template plugin
 
 # Import a bevy project to potoo format -> .po2
-potoo --import .
+potoo import .
 
 # Export a bevy project to multiple executables, current os is default
-potoo --export . --targets ["x86_64-pc-windows-msvc","wasm32-unknown-unknown","armv7-linux-androideabi"]
+potoo export . --targets ["x86_64-pc-windows-msvc","wasm32-unknown-unknown","armv7-linux-androideabi"]
 ```
 
 ## Automated Testing
 ![](https://img.shields.io/static/v1?label=Status&message=Planned&color=critical)</br>
-Create a framework based on templates for testing systems to catch errors, such as instantiations check prior to running bevy at runtime.
+Create a framework based on templates for testing systems to catch errors, such as instantiation and query logic checks prior to running bevy at runtime.
 
 # How does Potoo work?
 The layout of how setup in terms of plugin, client-server and reloading.
@@ -245,6 +245,7 @@ cargo r --example parse_bevy
 - [DGriffin91's Ridiculous bevy hot reloading](https://github.com/DGriffin91/ridiculous_bevy_hot_reloading)
 - [bevy_plugin_analyzer](https://github.com/atbentley/bevy_plugin_analyzer)
 - [SneakyBerry's Bevy Editor](https://github.com/SneakyBerry)
+- [rewin123's space_editor](https://github.com/rewin123/space_editor)
 
 # Licensing
 The project is under dual license MIT and Apache-2.0
